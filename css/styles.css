@@ -1,0 +1,871 @@
+/* =============================================
+   ElectroSpin - Motor DC Simulator
+   Estilos principales
+   ============================================= */
+
+:root {
+    --bg-primary: #0a0e1a;
+    --bg-secondary: #111827;
+    --bg-tertiary: #1a2332;
+    --bg-card: #151e2e;
+    --bg-input: #1e2a3a;
+    --border-color: #1e3a52;
+    --text-primary: #e8eef7;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-cyan: #00c8ff;
+    --accent-blue: #00aacc;
+    --accent-purple: #7850ff;
+    --accent-green: #44ff88;
+    --accent-red: #ff4466;
+    --accent-orange: #ffaa00;
+    --accent-yellow: #ffdd44;
+    --accent-pink: #ff4488;
+    --font-display: 'Orbitron', sans-serif;
+    --font-sans: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --shadow-glow: 0 0 20px rgba(0, 200, 255, 0.15);
+    --shadow-glow-strong: 0 0 40px rgba(0, 200, 255, 0.25);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+}
+
+/* =============================================
+   Fondo decorativo
+   ============================================= */
+
+.bg-decoration {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.bg-field-lines path {
+    stroke-dasharray: none;
+}
+
+/* =============================================
+   Header
+   ============================================= */
+
+.header {
+    position: relative;
+    z-index: 10;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    background: rgba(10, 14, 26, 0.8);
+    backdrop-filter: blur(12px);
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.logo-icon {
+    flex-shrink: 0;
+}
+
+.title {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 1px;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 300;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.nav-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.nav-link:hover {
+    color: var(--accent-cyan);
+    border-color: rgba(0, 200, 255, 0.3);
+    background: rgba(0, 200, 255, 0.05);
+}
+
+.nav-link.active {
+    color: var(--accent-cyan);
+    background: rgba(0, 200, 255, 0.1);
+    border-color: rgba(0, 200, 255, 0.2);
+}
+
+/* =============================================
+   Simulator Section
+   ============================================= */
+
+.simulator-section {
+    position: relative;
+    z-index: 10;
+    padding: 2rem 2rem 3rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.simulator-layout {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* Motor Container */
+.motor-container {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-glow);
+    backdrop-filter: blur(8px);
+}
+
+.motor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.5px;
+}
+
+.motor-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    background: var(--bg-tertiary);
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted);
+}
+
+.status-dot.running {
+    background: var(--accent-green);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--accent-green); }
+    50% { opacity: 0.5; box-shadow: 0 0 14px var(--accent-green); }
+}
+
+.motor-svg-wrapper {
+    background: radial-gradient(ellipse at center, #131c2e 0%, #0e1524 70%, #0a0f1a 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(30, 58, 82, 0.5);
+    padding: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.motor-svg-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 40%, rgba(0, 200, 255, 0.04), transparent 60%);
+    pointer-events: none;
+}
+
+.motor-svg {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Coil rotation animation on the SVG will be driven by the JS animation loop,
+   but we add a subtle CSS transition for when the simulation is stopped */
+.motor-svg #coilGroup {
+    transition: none;
+}
+
+/* =============================================
+   Legend
+   ============================================= */
+
+.motor-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.motor-note {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--text-muted);
+    background: rgba(0, 200, 255, 0.05);
+    border: 1px solid rgba(0, 200, 255, 0.12);
+    border-radius: 8px;
+}
+
+/* =============================================
+   Controls Panel
+   ============================================= */
+
+.controls-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.panel-section {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-glow);
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.5px;
+}
+
+.control-group {
+    margin-bottom: 1.25rem;
+}
+
+.control-group:last-child {
+    margin-bottom: 0;
+}
+
+.control-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.4rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.control-value {
+    font-family: var(--font-mono);
+    color: var(--accent-cyan);
+    background: rgba(0, 200, 255, 0.08);
+    padding: 0.2rem 0.6rem;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid rgba(0, 200, 255, 0.15);
+}
+
+/* Sliders */
+.slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid var(--bg-secondary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    transition: transform 0.2s;
+}
+
+.slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid var(--bg-secondary);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.slider-cyan {
+    background: linear-gradient(90deg, rgba(0, 200, 255, 0.2), rgba(0, 200, 255, 0.8));
+}
+.slider-cyan::-webkit-slider-thumb { background: var(--accent-cyan); }
+.slider-cyan::-moz-range-thumb { background: var(--accent-cyan); }
+
+.slider-purple {
+    background: linear-gradient(90deg, rgba(120, 80, 255, 0.2), rgba(120, 80, 255, 0.8));
+}
+.slider-purple::-webkit-slider-thumb { background: var(--accent-purple); }
+.slider-purple::-moz-range-thumb { background: var(--accent-purple); }
+
+.slider-blue {
+    background: linear-gradient(90deg, rgba(0, 170, 204, 0.2), rgba(0, 170, 204, 0.8));
+}
+.slider-blue::-webkit-slider-thumb { background: var(--accent-blue); }
+.slider-blue::-moz-range-thumb { background: var(--accent-blue); }
+
+.slider-green {
+    background: linear-gradient(90deg, rgba(68, 255, 136, 0.2), rgba(68, 255, 136, 0.8));
+}
+.slider-green::-webkit-slider-thumb { background: var(--accent-green); }
+.slider-green::-moz-range-thumb { background: var(--accent-green); }
+
+.slider-orange {
+    background: linear-gradient(90deg, rgba(255, 170, 0, 0.2), rgba(255, 170, 0, 0.8));
+}
+.slider-orange::-webkit-slider-thumb { background: var(--accent-orange); }
+.slider-orange::-moz-range-thumb { background: var(--accent-orange); }
+
+.slider-red {
+    background: linear-gradient(90deg, rgba(255, 68, 102, 0.2), rgba(255, 68, 102, 0.8));
+}
+.slider-red::-webkit-slider-thumb { background: var(--accent-red); }
+.slider-red::-moz-range-thumb { background: var(--accent-red); }
+
+.slider-range {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+}
+
+/* =============================================
+   Readings
+   ============================================= */
+
+.readings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.reading-card {
+    background: var(--bg-tertiary);
+    border: 1px solid rgba(30, 58, 82, 0.4);
+    border-radius: 10px;
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.reading-card:hover {
+    border-color: rgba(0, 200, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 200, 255, 0.1);
+}
+
+.reading-icon {
+    flex-shrink: 0;
+    opacity: 0.8;
+}
+
+.reading-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.reading-label {
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.reading-value {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* =============================================
+   Buttons
+   ============================================= */
+
+.control-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.9rem 1.2rem;
+    border-radius: 12px;
+    border: none;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-play {
+    background: linear-gradient(135deg, var(--accent-green), #2bad68);
+    color: #06210f;
+    box-shadow: 0 4px 20px rgba(68, 255, 136, 0.3);
+}
+
+.btn-play:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(68, 255, 136, 0.45);
+}
+
+.btn-play.stopped {
+    background: linear-gradient(135deg, var(--accent-red), #cc3355);
+    color: white;
+    box-shadow: 0 4px 20px rgba(255, 68, 102, 0.3);
+}
+
+.btn-play.stopped:hover {
+    box-shadow: 0 6px 30px rgba(255, 68, 102, 0.45);
+}
+
+.btn-reset {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-reset:hover {
+    color: var(--accent-cyan);
+    border-color: rgba(0, 200, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+/* =============================================
+   Theory Section
+   ============================================= */
+
+.theory-section {
+    position: relative;
+    z-index: 10;
+    padding: 3rem 2rem;
+    background: rgba(15, 22, 36, 0.8);
+    border-top: 1px solid var(--border-color);
+    backdrop-filter: blur(8px);
+}
+
+.theory-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.theory-title {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    font-size: 1.6rem;
+}
+
+.theory-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.theory-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.theory-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.theory-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 200, 255, 0.3);
+    box-shadow: var(--shadow-glow);
+}
+
+.theory-card:hover::before {
+    opacity: 1;
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.card-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.card-icon {
+    flex-shrink: 0;
+}
+
+.formula-box {
+    background: linear-gradient(135deg, rgba(0, 200, 255, 0.08), rgba(120, 80, 255, 0.08));
+    border: 1px solid rgba(0, 200, 255, 0.2);
+    border-radius: 8px;
+    padding: 0.9rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.formula {
+    font-family: var(--font-mono);
+    font-size: 1.05rem;
+    font-weight: 500;
+    color: var(--accent-cyan);
+}
+
+.theory-card p {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.formula-desc {
+    list-style: none;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    line-height: 1.8;
+}
+
+.formula-desc strong {
+    color: var(--accent-cyan);
+    font-family: var(--font-mono);
+}
+
+.formula-note {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    line-height: 1.55;
+    border-left: 2px solid rgba(0, 200, 255, 0.3);
+    padding-left: 0.75rem;
+}
+
+/* =============================================
+   About Section
+   ============================================= */
+
+.about-section {
+    position: relative;
+    z-index: 10;
+    padding: 3rem 2rem;
+}
+
+.about-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-title {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.6rem;
+}
+
+.about-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2.5rem;
+    text-align: center;
+    box-shadow: var(--shadow-glow);
+}
+
+.about-card h3 {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.about-card p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+}
+
+.about-authors {
+    margin: 1.5rem 0;
+}
+
+.about-authors h4 {
+    color: var(--accent-cyan);
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.about-authors ul {
+    list-style: none;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    line-height: 2;
+}
+
+.about-info {
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* =============================================
+   Footer
+   ============================================= */
+
+.footer {
+    position: relative;
+    z-index: 10;
+    border-top: 1px solid var(--border-color);
+    padding: 1.5rem 2rem;
+    background: rgba(10, 14, 26, 0.9);
+}
+
+.footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.footer-logo {
+    opacity: 0.6;
+}
+
+/* =============================================
+   Animations
+   ============================================= */
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes glow-pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* La animacion de las lineas de campo se maneja via SMIL en el SVG
+   (permite ajustar la velocidad segun el valor de B desde JS) */
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes rise {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.theory-card {
+    animation: rise 0.6s ease both;
+}
+
+.theory-card:nth-child(2) { animation-delay: 0.1s; }
+.theory-card:nth-child(3) { animation-delay: 0.2s; }
+.theory-card:nth-child(4) { animation-delay: 0.3s; }
+.theory-card:nth-child(5) { animation-delay: 0.4s; }
+.theory-card:nth-child(6) { animation-delay: 0.5s; }
+
+/* =============================================
+   Responsive
+   ============================================= */
+
+@media (max-width: 1200px) {
+    .simulator-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1024px) {
+    .theory-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .header {
+        padding: 1rem;
+    }
+    
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .nav-links {
+        justify-content: center;
+    }
+    
+    .simulator-section {
+        padding: 1rem;
+    }
+    
+    .theory-section {
+        padding: 2rem 1rem;
+    }
+    
+    .theory-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .readings-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .control-buttons {
+        flex-direction: column;
+    }
+    
+    .title {
+        font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .motor-legend {
+        gap: 0.75rem;
+        font-size: 0.65rem;
+    }
+    
+    .about-card {
+        padding: 1.5rem;
+    }
+}
+
+/* Animacion del fallback para el circulo giratorio del logo */
+@media (prefers-reduced-motion: reduce) {
+    .status-dot.running {
+        animation: none;
+    }
+}

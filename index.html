@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElectroSpin - Simulador de Motor DC</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Decorative SVG Background -->
+    <svg class="bg-decoration" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+        <defs>
+            <radialGradient id="glow1" cx="20%" cy="30%" r="40%">
+                <stop offset="0%" stop-color="rgba(0,200,255,0.08)"/>
+                <stop offset="100%" stop-color="rgba(0,200,255,0)"/>
+            </radialGradient>
+            <radialGradient id="glow2" cx="80%" cy="70%" r="35%">
+                <stop offset="0%" stop-color="rgba(120,80,255,0.06)"/>
+                <stop offset="100%" stop-color="rgba(120,80,255,0)"/>
+            </radialGradient>
+            <linearGradient id="fieldLine" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="rgba(0,200,255,0.4)"/>
+                <stop offset="50%" stop-color="rgba(0,200,255,0.15)"/>
+                <stop offset="100%" stop-color="rgba(0,200,255,0.4)"/>
+            </linearGradient>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#glow1)"/>
+        <rect width="100%" height="100%" fill="url(#glow2)"/>
+        <!-- Animated magnetic field lines in background -->
+        <g class="bg-field-lines" opacity="0.3">
+            <path d="M-100,200 Q300,180 500,250 T1100,200 T1600,220" fill="none" stroke="rgba(0,200,255,0.2)" stroke-width="1">
+                <animate attributeName="d" dur="8s" repeatCount="indefinite"
+                    values="M-100,200 Q300,180 500,250 T1100,200 T1600,220;
+                            M-100,210 Q300,250 500,190 T1100,230 T1600,200;
+                            M-100,200 Q300,180 500,250 T1100,200 T1600,220"/>
+            </path>
+            <path d="M-100,400 Q400,350 700,420 T1200,380 T1600,400" fill="none" stroke="rgba(120,80,255,0.15)" stroke-width="1">
+                <animate attributeName="d" dur="10s" repeatCount="indefinite"
+                    values="M-100,400 Q400,350 700,420 T1200,380 T1600,400;
+                            M-100,380 Q400,420 700,360 T1200,410 T1600,380;
+                            M-100,400 Q400,350 700,420 T1200,380 T1600,400"/>
+            </path>
+            <path d="M-100,650 Q350,620 600,680 T1100,640 T1600,660" fill="none" stroke="rgba(0,200,255,0.12)" stroke-width="1">
+                <animate attributeName="d" dur="12s" repeatCount="indefinite"
+                    values="M-100,650 Q350,620 600,680 T1100,640 T1600,660;
+                            M-100,660 Q350,680 600,630 T1100,670 T1600,640;
+                            M-100,650 Q350,620 600,680 T1100,640 T1600,660"/>
+            </path>
+        </g>
+        <!-- Floating particles -->
+        <g class="particles">
+            <circle cx="100" cy="150" r="2" fill="rgba(0,200,255,0.4)">
+                <animate attributeName="cy" dur="6s" values="150;100;150" repeatCount="indefinite"/>
+                <animate attributeName="opacity" dur="6s" values="0.4;0.8;0.4" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="350" cy="400" r="1.5" fill="rgba(120,80,255,0.3)">
+                <animate attributeName="cy" dur="8s" values="400;350;400" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="900" cy="200" r="2" fill="rgba(0,200,255,0.3)">
+                <animate attributeName="cy" dur="7s" values="200;150;200" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="1200" cy="500" r="1.5" fill="rgba(120,80,255,0.25)">
+                <animate attributeName="cy" dur="9s" values="500;440;500" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="600" cy="700" r="2" fill="rgba(0,200,255,0.2)">
+                <animate attributeName="cy" dur="5s" values="700;660;700" repeatCount="indefinite"/>
+            </circle>
+        </g>
+    </svg>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-area">
+                <svg class="logo-icon" viewBox="0 0 60 60" width="60" height="60">
+                    <defs>
+                        <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#00c8ff"/>
+                            <stop offset="100%" stop-color="#7850ff"/>
+                        </linearGradient>
+                    </defs>
+                    <circle cx="30" cy="30" r="28" fill="none" stroke="url(#logoGrad)" stroke-width="2" opacity="0.6"/>
+                    <circle cx="30" cy="30" r="20" fill="none" stroke="url(#logoGrad)" stroke-width="1.5" opacity="0.4"/>
+                    <path d="M30 10 L30 50 M10 30 L50 30" stroke="url(#logoGrad)" stroke-width="1" opacity="0.3"/>
+                    <circle cx="30" cy="30" r="6" fill="url(#logoGrad)" opacity="0.8"/>
+                    <path d="M30 18 L34 26 L30 24 L26 26 Z" fill="#00c8ff" opacity="0.7">
+                        <animateTransform attributeName="transform" type="rotate" from="0 30 30" to="360 30 30" dur="4s" repeatCount="indefinite"/>
+                    </path>
+                </svg>
+                <div>
+                    <h1 class="title">ElectroSpin</h1>
+                    <p class="subtitle">Simulador Interactivo de Motor DC</p>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="#simulador" class="nav-link active">Simulador</a>
+                <a href="#variables" class="nav-link">Efecto de las Variables</a>
+                <a href="#teoria" class="nav-link">Teoria</a>
+                <a href="#acerca" class="nav-link">Acerca de</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Simulator Section -->
+    <main id="simulador" class="simulator-section">
+        <div class="simulator-layout">
+            <!-- Motor Visualization -->
+            <div class="motor-container">
+                <div class="motor-header">
+                    <h2 class="section-title">Vista del Motor DC</h2>
+                    <div class="motor-status">
+                        <span class="status-dot" id="statusDot"></span>
+                        <span id="statusText">Detenido</span>
+                    </div>
+                </div>
+                <div class="motor-svg-wrapper">
+                    <svg id="motorSVG" viewBox="0 0 600 500" class="motor-svg">
+                        <defs>
+                            <linearGradient id="magnetN" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#cc3333"/>
+                                <stop offset="100%" stop-color="#ff5555"/>
+                            </linearGradient>
+                            <linearGradient id="magnetS" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#3355cc"/>
+                                <stop offset="100%" stop-color="#5577ff"/>
+                            </linearGradient>
+                            <linearGradient id="coilGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#ffaa00"/>
+                                <stop offset="100%" stop-color="#ff8800"/>
+                            </linearGradient>
+                            <linearGradient id="shaftGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#666"/>
+                                <stop offset="50%" stop-color="#999"/>
+                                <stop offset="100%" stop-color="#666"/>
+                            </linearGradient>
+                            <filter id="glow">
+                                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Background grid -->
+                        <g class="grid" opacity="0.08">
+                            <line x1="0" y1="0" x2="0" y2="500" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="50" y1="0" x2="50" y2="500" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="100" y1="0" x2="100" y2="500" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="150" y1="0" x2="150" y2="500" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="200" y1="0" x2="200" y2="500" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="250" y1="0" x2="250" y2="500" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="300" y1="0" x2="300" y2="500" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="350" y1="0" x2="350" y2="500" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="400" y1="0" x2="400" y2="500" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="450" y1="0" x2="450" y2="500" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="500" y1="0" x2="500" y2="500" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="550" y1="0" x2="550" y2="500" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="600" y1="0" x2="600" y2="500" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="0" y1="50" x2="600" y2="50" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="0" y1="100" x2="600" y2="100" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="0" y1="150" x2="600" y2="150" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="0" y1="200" x2="600" y2="200" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="0" y1="250" x2="600" y2="250" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="0" y1="300" x2="600" y2="300" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="0" y1="350" x2="600" y2="350" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="0" y1="400" x2="600" y2="400" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="0" y1="450" x2="600" y2="450" stroke="#00c8ff" stroke-width="0.5"/>
+                            <line x1="0" y1="500" x2="600" y2="500" stroke="#00c8ff" stroke-width="0.5"/>
+                        </g>
+
+                        <!-- Magnetic Field Lines (animated) -->
+                        <g id="fieldLines" class="field-lines" opacity="0.5">
+                            <line x1="135" y1="150" x2="465" y2="150" stroke="#00c8ff" stroke-width="1" stroke-dasharray="8,4" opacity="0.6">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1s" repeatCount="indefinite"/>
+                            </line>
+                            <line x1="135" y1="190" x2="465" y2="190" stroke="#00c8ff" stroke-width="1" stroke-dasharray="8,4" opacity="0.5">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1s" repeatCount="indefinite"/>
+                            </line>
+                            <line x1="135" y1="230" x2="465" y2="230" stroke="#00c8ff" stroke-width="1.2" stroke-dasharray="8,4" opacity="0.7">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1s" repeatCount="indefinite"/>
+                            </line>
+                            <line x1="135" y1="270" x2="465" y2="270" stroke="#00c8ff" stroke-width="1.2" stroke-dasharray="8,4" opacity="0.7">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1s" repeatCount="indefinite"/>
+                            </line>
+                            <line x1="135" y1="310" x2="465" y2="310" stroke="#00c8ff" stroke-width="1" stroke-dasharray="8,4" opacity="0.5">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1s" repeatCount="indefinite"/>
+                            </line>
+                            <line x1="135" y1="350" x2="465" y2="350" stroke="#00c8ff" stroke-width="1" stroke-dasharray="8,4" opacity="0.6">
+                                <animate attributeName="stroke-dashoffset" from="0" to="-24" dur="1s" repeatCount="indefinite"/>
+                            </line>
+                        </g>
+
+                        <!-- B label -->
+                        <text x="300" y="130" text-anchor="middle" fill="#00c8ff" font-family="JetBrains Mono" font-size="14" opacity="0.8" filter="url(#glow)">
+                            B &#8594;
+                        </text>
+
+                        <!-- N Magnet (Left) -->
+                        <g id="magnetNGroup">
+                            <rect x="60" y="140" width="75" height="230" rx="6" fill="url(#magnetN)" opacity="0.9"/>
+                            <rect x="60" y="140" width="75" height="230" rx="6" fill="none" stroke="#ff6666" stroke-width="1" opacity="0.5"/>
+                            <text x="97" y="265" text-anchor="middle" fill="white" font-family="Orbitron" font-size="28" font-weight="bold">N</text>
+                            <text x="97" y="390" text-anchor="middle" fill="#ff8888" font-family="JetBrains Mono" font-size="10">Norte</text>
+                        </g>
+
+                        <!-- S Magnet (Right) -->
+                        <g id="magnetSGroup">
+                            <rect x="465" y="140" width="75" height="230" rx="6" fill="url(#magnetS)" opacity="0.9"/>
+                            <rect x="465" y="140" width="75" height="230" rx="6" fill="none" stroke="#6688ff" stroke-width="1" opacity="0.5"/>
+                            <text x="502" y="265" text-anchor="middle" fill="white" font-family="Orbitron" font-size="28" font-weight="bold">S</text>
+                            <text x="502" y="390" text-anchor="middle" fill="#88aaff" font-family="JetBrains Mono" font-size="10">Sur</text>
+                        </g>
+
+                        <!-- Motor Housing -->
+                        <rect x="135" y="135" width="330" height="240" rx="8" fill="none" stroke="#334" stroke-width="2" stroke-dasharray="4,2" opacity="0.4"/>
+
+                        <!-- Coil Group (rotacion sobre el eje vertical central) -->
+                        <g id="coilGroup">
+                            <!-- Eje de rotacion (linea central, referencia) -->
+                            <line id="axisLine" x1="300" y1="165" x2="300" y2="345" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3,5"/>
+                            <!-- Flecha de sentido de rotacion -->
+                            <g id="rotationArrow" opacity="0.4">
+                                <path d="M 342 213 A 48 48 0 0 1 342 297" fill="none" stroke="#8899bb" stroke-width="2" stroke-linecap="round"/>
+                                <polygon points="342,297 331,284 353,284" fill="#8899bb"/>
+                                <path d="M 258 297 A 48 48 0 0 1 258 213" fill="none" stroke="#8899bb" stroke-width="2" stroke-linecap="round"/>
+                                <polygon points="258,213 269,226 247,226" fill="#8899bb"/>
+                            </g>
+                            <!-- Poligono de la bobina (proyeccion; JS actualiza sus vertices) -->
+                            <polygon id="coilPoly" points="230,185 370,185 370,325 230,325" fill="rgba(255,170,0,0.06)" stroke="url(#coilGrad)" stroke-width="3" stroke-linejoin="round"/>
+                            <!-- Conductor trasero (dibujado detras, mas tenue) -->
+                            <line id="conductorBack" x1="370" y1="185" x2="370" y2="325" stroke="#cc7a00" stroke-width="5" stroke-linecap="round" opacity="0.35"/>
+                            <!-- Conductor frontal (mas luminoso) -->
+                            <line id="conductorFront" x1="230" y1="185" x2="230" y2="325" stroke="#ffaa00" stroke-width="7" stroke-linecap="round"/>
+
+                            <!-- Simbolos de fuerza: regla de la mano derecha (F = I x B) -->
+                            <!-- 'saliente' hacia el observador -->
+                            <text id="forceSymbolFront" x="0" y="0" text-anchor="middle" font-family="JetBrains Mono" font-weight="bold" font-size="24" fill="#44ff88">&#x2299;</text>
+                            <text id="forceLabelFront" x="0" y="0" text-anchor="middle" font-family="JetBrains Mono" font-weight="bold" font-size="11" fill="#44ff88">F</text>
+                            <!-- 'entrante' hacia la pagina -->
+                            <text id="forceSymbolBack" x="0" y="0" text-anchor="middle" font-family="JetBrains Mono" font-weight="bold" font-size="18" fill="#44ff88" opacity="0.5">&#x2297;</text>
+                            <text id="forceLabelBack" x="0" y="0" text-anchor="middle" font-family="JetBrains Mono" font-weight="bold" font-size="11" fill="#44ff88" opacity="0.5">F</text>
+
+                            <!-- Flechas de direccion de la corriente (el conmutador las invierte cada 180 grados) -->
+                            <text id="currentArrowFront" x="0" y="0" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#ffdd44" filter="url(#glow)">&#x25B2;</text>
+                            <text id="currentArrowBack" x="0" y="0" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#ffdd44" filter="url(#glow)" opacity="0.6">&#x25BC;</text>
+                        </g>
+
+                        <!-- Center dot / axis indicator -->
+                        <circle cx="300" cy="255" r="4" fill="#555" stroke="#777" stroke-width="1"/>
+
+                        <!-- Rotation axis -->
+                        <line id="shaft" x1="300" y1="380" x2="300" y2="460" stroke="url(#shaftGrad)" stroke-width="6" stroke-linecap="round"/>
+
+                        <!-- Commutator -->
+                        <g id="commutatorGroup">
+                            <rect x="275" y="375" width="50" height="20" rx="3" fill="#886622" stroke="#aa8833" stroke-width="1"/>
+                            <line id="splitLine" x1="300" y1="375" x2="300" y2="395" stroke="#444" stroke-width="2"/>
+                            <text x="300" y="415" text-anchor="middle" fill="#aa8833" font-family="JetBrains Mono" font-size="9">Conmutador</text>
+                        </g>
+
+                        <!-- Brushes -->
+                        <rect x="260" y="378" width="12" height="14" rx="2" fill="#555" stroke="#777" stroke-width="1"/>
+                        <rect x="328" y="378" width="12" height="14" rx="2" fill="#555" stroke="#777" stroke-width="1"/>
+
+                        <!-- Shaft base -->
+                        <rect x="280" y="455" width="40" height="15" rx="3" fill="#444" stroke="#555" stroke-width="1"/>
+                        <text x="300" y="485" text-anchor="middle" fill="#666" font-family="JetBrains Mono" font-size="9">Eje de rotacion</text>
+
+                        <!-- Voltage source indicator -->
+                        <g id="voltageSource">
+                            <rect x="20" y="440" width="80" height="35" rx="5" fill="rgba(0,200,255,0.1)" stroke="rgba(0,200,255,0.3)" stroke-width="1"/>
+                            <text x="60" y="455" text-anchor="middle" fill="#00c8ff" font-family="JetBrains Mono" font-size="9">Fuente</text>
+                            <text id="voltageLabelSVG" x="60" y="468" text-anchor="middle" fill="#00c8ff" font-family="JetBrains Mono" font-size="11" font-weight="bold">12V</text>
+                            <!-- Wires -->
+                            <line x1="60" y1="440" x2="60" y2="400" stroke="#00c8ff" stroke-width="1.5" opacity="0.5"/>
+                            <line x1="60" y1="400" x2="266" y2="400" stroke="#00c8ff" stroke-width="1.5" opacity="0.5" stroke-dasharray="4,3"/>
+                            <line x1="540" y1="400" x2="540" y2="440" stroke="#00c8ff" stroke-width="1.5" opacity="0.5"/>
+                            <line x1="334" y1="400" x2="540" y2="400" stroke="#00c8ff" stroke-width="1.5" opacity="0.5" stroke-dasharray="4,3"/>
+                        </g>
+
+                        <!-- RPM Display -->
+                        <g id="rpmDisplay">
+                            <rect x="460" y="430" width="100" height="40" rx="5" fill="rgba(0,200,255,0.08)" stroke="rgba(0,200,255,0.25)" stroke-width="1"/>
+                            <text x="510" y="447" text-anchor="middle" fill="#00c8ff" font-family="JetBrains Mono" font-size="9">RPM</text>
+                            <text id="rpmValueSVG" x="510" y="462" text-anchor="middle" fill="#00c8ff" font-family="Orbitron" font-size="14" font-weight="bold">0</text>
+                        </g>
+                    </svg>
+                </div>
+
+                <!-- Legend -->
+                <div class="motor-legend">
+                    <div class="legend-item">
+                        <span class="legend-color" style="background:#00c8ff"></span>
+                        <span>Campo Magnetico (B)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background:#ffaa00"></span>
+                        <span>Bobina / Conductor</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background:#44ff88"></span>
+                        <span>Fuerza &#x2299; saliente / &#x2297; entrante (F)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background:#ffdd44"></span>
+                        <span>Corriente (I) - el conmutador la invierte</span>
+                    </div>
+                </div>
+
+                <p class="motor-note">
+                    Vista de perfil: la bobina gira sobre el eje vertical central (se observa
+                    "achatandose" en su proyeccion). Por la regla de la mano derecha (F = I &#215; B),
+                    la fuerza sobre cada conductor es perpendicular al plano de la vista:
+                    &#x2299; sale de la pantalla y &#x2297; entra a ella. El conmutador invierte la
+                    corriente cada media vuelta para que el torque no cambie de sentido.
+                </p>
+            </div>
+
+            <!-- Control Panel & Readings -->
+            <div class="controls-panel">
+                <!-- Control Sliders -->
+                <div class="panel-section">
+                    <h3 class="panel-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2">
+                            <circle cx="12" cy="12" r="3"/><path d="M12 1v4m0 14v4m-7.07-3.93l2.83-2.83m8.48-8.48l2.83-2.83M1 12h4m14 0h4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83"/>
+                        </svg>
+                        Panel de Control
+                    </h3>
+
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span>Voltaje (V)</span>
+                            <span class="control-value" id="voltageValue">12.0 V</span>
+                        </label>
+                        <input type="range" id="voltageSlider" class="slider slider-cyan" min="0" max="24" step="0.5" value="12">
+                        <div class="slider-range"><span>0V</span><span>24V</span></div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span>Resistencia (R)</span>
+                            <span class="control-value" id="resistanceValue">5.0 &#8486;</span>
+                        </label>
+                        <input type="range" id="resistanceSlider" class="slider slider-purple" min="1" max="50" step="0.5" value="5">
+                        <div class="slider-range"><span>1&#8486;</span><span>50&#8486;</span></div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span>Campo Magnetico (B)</span>
+                            <span class="control-value" id="bFieldValue">0.50 T</span>
+                        </label>
+                        <input type="range" id="bFieldSlider" class="slider slider-blue" min="0.05" max="2" step="0.05" value="0.5">
+                        <div class="slider-range"><span>0.05T</span><span>2.0T</span></div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span>Longitud del Conductor (L)</span>
+                            <span class="control-value" id="lengthValue">0.20 m</span>
+                        </label>
+                        <input type="range" id="lengthSlider" class="slider slider-green" min="0.05" max="0.5" step="0.01" value="0.20">
+                        <div class="slider-range"><span>0.05m</span><span>0.50m</span></div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span>Vueltas de la Bobina (N)</span>
+                            <span class="control-value" id="turnsValue">100</span>
+                        </label>
+                        <input type="range" id="turnsSlider" class="slider slider-orange" min="10" max="500" step="10" value="100">
+                        <div class="slider-range"><span>10</span><span>500</span></div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">
+                            <span>Radio del Eje (r)</span>
+                            <span class="control-value" id="radiusValue">0.05 m</span>
+                        </label>
+                        <input type="range" id="radiusSlider" class="slider slider-red" min="0.01" max="0.15" step="0.005" value="0.05">
+                        <div class="slider-range"><span>0.01m</span><span>0.15m</span></div>
+                    </div>
+                </div>
+
+                <!-- Real-time Readings -->
+                <div class="panel-section readings-section">
+                    <h3 class="panel-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#44ff88" stroke-width="2">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                        </svg>
+                        Lecturas en Tiempo Real
+                    </h3>
+
+                    <div class="readings-grid">
+                        <div class="reading-card">
+                            <div class="reading-icon" style="color:#ffdd44">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                                </svg>
+                            </div>
+                            <div class="reading-info">
+                                <span class="reading-label">Corriente (I)</span>
+                                <span class="reading-value" id="currentReading">0.00 A</span>
+                            </div>
+                        </div>
+
+                        <div class="reading-card">
+                            <div class="reading-icon" style="color:#44ff88">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                </svg>
+                            </div>
+                            <div class="reading-info">
+                                <span class="reading-label">Fuerza (F)</span>
+                                <span class="reading-value" id="forceReading">0.00 N</span>
+                            </div>
+                        </div>
+
+                        <div class="reading-card">
+                            <div class="reading-icon" style="color:#00c8ff">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
+                                </svg>
+                            </div>
+                            <div class="reading-info">
+                                <span class="reading-label">Torque (&#964;)</span>
+                                <span class="reading-value" id="torqueReading">0.000 N·m</span>
+                            </div>
+                        </div>
+
+                        <div class="reading-card">
+                            <div class="reading-icon" style="color:#ff8866">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2v20M2 12h20"/>
+                                </svg>
+                            </div>
+                            <div class="reading-info">
+                                <span class="reading-label">Vel. Angular (&#969;)</span>
+                                <span class="reading-value" id="omegaReading">0.00 rad/s</span>
+                            </div>
+                        </div>
+
+                        <div class="reading-card">
+                            <div class="reading-icon" style="color:#7850ff">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 2v10l7-7"/>
+                                </svg>
+                            </div>
+                            <div class="reading-info">
+                                <span class="reading-label">RPM</span>
+                                <span class="reading-value" id="rpmReading">0 rpm</span>
+                            </div>
+                        </div>
+
+                        <div class="reading-card">
+                            <div class="reading-icon" style="color:#ff4488">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                                </svg>
+                            </div>
+                            <div class="reading-info">
+                                <span class="reading-label">Potencia (P)</span>
+                                <span class="reading-value" id="powerReading">0.00 W</span>
+                            </div>
+                        </div>
+
+                        <div class="reading-card">
+                            <div class="reading-icon" style="color:#00aacc">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>
+                                </svg>
+                            </div>
+                            <div class="reading-info">
+                                <span class="reading-label">Back-EMF</span>
+                                <span class="reading-value" id="backEmfReading">0.00 V</span>
+                            </div>
+                        </div>
+
+                        <div class="reading-card">
+                            <div class="reading-icon" style="color:#ffcc00">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+                                </svg>
+                            </div>
+                            <div class="reading-info">
+                                <span class="reading-label">Efficiencia (&#951;)</span>
+                                <span class="reading-value" id="efficiencyReading">0 %</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Play/Stop Button -->
+                <div class="control-buttons">
+                    <button id="playBtn" class="btn btn-play" onclick="toggleSimulation()">
+                        <svg id="playIcon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <polygon points="5,3 19,12 5,21"/>
+                        </svg>
+                        <svg id="stopIcon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+                            <rect x="4" y="4" width="16" height="16" rx="2"/>
+                        </svg>
+                        <span id="playBtnText">Iniciar Simulacion</span>
+                    </button>
+                    <button class="btn btn-reset" onclick="resetSimulation()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 4v6h6M23 20v-6h-6"/>
+                            <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+                        </svg>
+                        Reiniciar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Theory Section -->
+    <section id="teoria" class="theory-section">
+        <div class="theory-container">
+            <h2 class="section-title theory-title">Marco Teorico</h2>
+
+            <div class="theory-grid">
+                <!-- Card 1: Lorentz Force -->
+                <div class="theory-card">
+                    <div class="card-header">
+                        <svg class="card-icon" viewBox="0 0 50 50" width="50" height="50">
+                            <circle cx="25" cy="25" r="23" fill="none" stroke="#00c8ff" stroke-width="1.5" opacity="0.4"/>
+                            <path d="M15 25 L25 15 L35 25 L25 35 Z" fill="none" stroke="#00c8ff" stroke-width="1.5"/>
+                            <circle cx="25" cy="25" r="3" fill="#00c8ff"/>
+                        </svg>
+                        <h3>Fuerza de Lorentz</h3>
+                    </div>
+                    <div class="formula-box">
+                        <span class="formula">F = N · B · I · L</span>
+                    </div>
+                    <p>La fuerza magnetica que actua sobre un conductor por el que circula una corriente electrica dentro de un campo magnetico. Esta fuerza es la responsable del movimiento de la bobina y, por tanto, de la rotacion del motor.</p>
+                    <ul class="formula-desc">
+                        <li><strong>F</strong> = Fuerza magnetica (N)</li>
+                        <li><strong>N</strong> = Numero de vueltas de la bobina</li>
+                        <li><strong>B</strong> = Campo magnetico (T)</li>
+                        <li><strong>I</strong> = Corriente electrica (A)</li>
+                        <li><strong>L</strong> = Longitud del conductor (m)</li>
+                    </ul>
+                    <p class="formula-note">
+                        Con la regla de la mano derecha (F = I &#215; B) la fuerza sobre cada conductor
+                        es perpendicular al plano: sale de la pantalla (&#x2299;) del lado que esta al
+                        frente y entra a la pagina (&#x2297;) del lado opuesto, siempre opuestas entre si
+                        para generar el giro. Observa estos simbolos en la animacion.
+                    </p>
+                </div>
+
+                <!-- Card 2: Ohm's Law -->
+                <div class="theory-card">
+                    <div class="card-header">
+                        <svg class="card-icon" viewBox="0 0 50 50" width="50" height="50">
+                            <circle cx="25" cy="25" r="23" fill="none" stroke="#7850ff" stroke-width="1.5" opacity="0.4"/>
+                            <path d="M15 25 Q20 15 25 25 Q30 35 35 25" fill="none" stroke="#7850ff" stroke-width="2"/>
+                        </svg>
+                        <h3>Ley de Ohm</h3>
+                    </div>
+                    <div class="formula-box">
+                        <span class="formula">I = V / R</span>
+                    </div>
+                    <p>La corriente electrica que circula por el circuito del motor depende del voltaje aplicado y la resistencia del bobinado. Un mayor voltaje produce mayor corriente, incrementando la fuerza sobre la bobina.</p>
+                    <ul class="formula-desc">
+                        <li><strong>I</strong> = Corriente electrica (A)</li>
+                        <li><strong>V</strong> = Voltaje aplicado (V)</li>
+                        <li><strong>R</strong> = Resistencia del bobinado (&#8486;)</li>
+                    </ul>
+                </div>
+
+                <!-- Card 3: Torque -->
+                <div class="theory-card">
+                    <div class="card-header">
+                        <svg class="card-icon" viewBox="0 0 50 50" width="50" height="50">
+                            <circle cx="25" cy="25" r="23" fill="none" stroke="#44ff88" stroke-width="1.5" opacity="0.4"/>
+                            <circle cx="25" cy="25" r="8" fill="none" stroke="#44ff88" stroke-width="1.5"/>
+                            <path d="M25 17 L25 10 M33 25 L40 25 M25 33 L25 40 M17 25 L10 25" stroke="#44ff88" stroke-width="1.5"/>
+                        </svg>
+                        <h3>Torque Motor</h3>
+                    </div>
+                    <div class="formula-box">
+                        <span class="formula">&#964; = F · r</span>
+                    </div>
+                    <p>El torque o momento de fuerza es el giro que experimenta la bobina alrededor del eje. Se genera por la accion de la fuerza de Lorentz a una distancia r del eje de rotacion.</p>
+                    <ul class="formula-desc">
+                        <li><strong>&#964;</strong> = Torque (N·m)</li>
+                        <li><strong>F</strong> = Fuerza magnetica (N)</li>
+                        <li><strong>r</strong> = Radio del eje (m)</li>
+                    </ul>
+                </div>
+
+                <!-- Card 4: Back-EMF -->
+                <div class="theory-card">
+                    <div class="card-header">
+                        <svg class="card-icon" viewBox="0 0 50 50" width="50" height="50">
+                            <circle cx="25" cy="25" r="23" fill="none" stroke="#ff8866" stroke-width="1.5" opacity="0.4"/>
+                            <path d="M15 35 L25 15 L35 35" fill="none" stroke="#ff8866" stroke-width="2"/>
+                            <line x1="20" y1="28" x2="30" y2="28" stroke="#ff8866" stroke-width="1.5"/>
+                        </svg>
+                        <h3>Back-EMF</h3>
+                    </div>
+                    <div class="formula-box">
+                        <span class="formula">V<sub>back</sub> = k · &#969;</span>
+                    </div>
+                    <p>Cuando la bobina gira dentro del campo magnetico, se genera una fuerza electromotriz (FEM) inducida que se opone al voltaje aplicado. A mayor velocidad angular, mayor es esta contravoltaje.</p>
+                    <ul class="formula-desc">
+                        <li><strong>V<sub>back</sub></strong> = FEM inducida (V)</li>
+                        <li><strong>k</strong> = Constante del motor (V·s/rad)</li>
+                        <li><strong>&#969;</strong> = Velocidad angular (rad/s)</li>
+                    </ul>
+                </div>
+
+                <!-- Card 5: Power -->
+                <div class="theory-card">
+                    <div class="card-header">
+                        <svg class="card-icon" viewBox="0 0 50 50" width="50" height="50">
+                            <circle cx="25" cy="25" r="23" fill="none" stroke="#ff4488" stroke-width="1.5" opacity="0.4"/>
+                            <path d="M25 10 L28 20 L38 20 L30 27 L33 37 L25 30 L17 37 L20 27 L12 20 L22 20 Z" fill="none" stroke="#ff4488" stroke-width="1.5"/>
+                        </svg>
+                        <h3>Potencia</h3>
+                    </div>
+                    <div class="formula-box">
+                        <span class="formula">P = V · I = &#964; · &#969;</span>
+                    </div>
+                    <p>La potencia electrica consumida por el motor se transforma en potencia mecanica. La eficiencia del motor depende de las perdidas por calor en la resistencia del bobinado.</p>
+                    <ul class="formula-desc">
+                        <li><strong>P</strong> = Potencia electrica (W)</li>
+                        <li><strong>V</strong> = Voltaje (V)</li>
+                        <li><strong>I</strong> = Corriente (A)</li>
+                    </ul>
+                </div>
+
+                <!-- Card 6: Commutator -->
+                <div class="theory-card">
+                    <div class="card-header">
+                        <svg class="card-icon" viewBox="0 0 50 50" width="50" height="50">
+                            <circle cx="25" cy="25" r="23" fill="none" stroke="#ffcc00" stroke-width="1.5" opacity="0.4"/>
+                            <circle cx="25" cy="25" r="10" fill="none" stroke="#ffcc00" stroke-width="2"/>
+                            <line x1="25" y1="15" x2="25" y2="35" stroke="#ffcc00" stroke-width="2"/>
+                            <circle cx="18" cy="25" r="2" fill="#ffcc00"/>
+                            <circle cx="32" cy="25" r="2" fill="#ffcc00"/>
+                        </svg>
+                        <h3>Conmutador</h3>
+                    </div>
+                    <div class="formula-box">
+                        <span class="formula">Inversion cada 180&#176;</span>
+                    </div>
+                    <p>El conmutador es un interruptor mecanico que invierte periodicamente el sentido de la corriente en la bobina cada media vuelta (180&#176;). Esto asegura que el torque siempre se produzca en la misma direccion, manteniendo la rotacion continua.</p>
+                    <ul class="formula-desc">
+                        <li>Cuando la bobina alcanza la posicion vertical, los segmentos del conmutador cambian de contacto, invirtiendo la corriente.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="acerca" class="about-section">
+        <div class="about-container">
+            <h2 class="section-title about-title">Acerca del Proyecto</h2>
+            <div class="about-content">
+                <div class="about-card">
+                    <h3>ElectroSpin</h3>
+                    <p>Simulador web interactivo para el analisis y visualizacion de un motor de corriente continua (DC). Desarrollado como herramienta educativa que conecta los principios de Electricidad y Magnetismo con concepts de Ingenieria de Sistemas.</p>
+                    <div class="about-authors">
+                        <h4>Autors</h4>
+                        <ul>
+                            <li>Julian Alejandro Gil Peralta</li>
+                            <li>Daniel Ramiro Galeano Teyes</li>
+                            <li>Juan David Galeano Barrera</li>
+                        </ul>
+                    </div>
+                    <div class="about-info">
+                        <span>Ingenieria de Sistemas - 2026</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <svg class="footer-logo" viewBox="0 0 40 40" width="30" height="30">
+                <circle cx="20" cy="20" r="18" fill="none" stroke="#00c8ff" stroke-width="1" opacity="0.5"/>
+                <circle cx="20" cy="20" r="4" fill="#00c8ff" opacity="0.6"/>
+            </svg>
+            <span>ElectroSpin 2026 - Motor DC Simulator</span>
+        </div>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
