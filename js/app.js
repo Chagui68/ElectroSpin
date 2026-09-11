@@ -11,6 +11,8 @@
 const coilPoly = document.getElementById('coilPoly');
 const conductorFront = document.getElementById('conductorFront');
 const conductorBack = document.getElementById('conductorBack');
+const rotCircle = document.getElementById('rotCircle');
+const rotArc = document.getElementById('rotArc');
 const forceSymbolFront = document.getElementById('forceSymbolFront');
 const forceSymbolBack = document.getElementById('forceSymbolBack');
 const forceLabelFront = document.getElementById('forceLabelFront');
@@ -87,13 +89,23 @@ const PHYSICS = {
  *   detras  -> (cx - r·cos θ, cz = -r·sin θ)
  * Proyectamos solo X/Y: el ancho de la bobina se "achata" con cos θ
  * y los conductores avanzan/retroceden con sin θ (profundidad).
+ *
+ * El radio y la altura VISUALES crecen con el deslizador de radio del
+ * eje (r), y el grosor de los conductores con el numero de vueltas (N),
+ * para que la animacion refleje los cambios del usuario.
  */
-const COIL = {
+const COIL_C = {
     cx: 300,
-    cy: 255,
-    r: 70,       // medio ancho (radio de giro de los conductores)
-    h: 70        // media altura
+    cy: 255
 };
+
+function coilRadius() {
+    return 50 + state.radius * 366;   // ~54 a ~105 px para r = 0.01..0.15 m
+}
+
+function coilHalfHeight() {
+    return 50 + state.radius * 300;   // ~53 a ~95 px
+}
 
 /**
  * Modelo fisico del motor DC.
@@ -201,9 +213,16 @@ function updateFieldLines() {
  * - El conmutador invierte la corriente cada media vuelta.
  */
 function updateCoil() {
-    const { cx, cy, r, h } = COIL;
+    const { cx, cy } = COIL_C;
+    const r = coilRadius();
+    const h = coilHalfHeight();
     const cos = Math.cos(state.angle);
     const sin = Math.sin(state.angle);
+
+    // Grosor de los conductores segun el numero de vueltas (N)
+    const nNorm = Math.min(1, state.turns / 500);
+    const strokeF = 5 + nNorm * 8;   // 5 .. 13 px
+    const strokeB = 3 + nNorm * 5;   // 3 .. 8  px
 
     // Conductores en la tralectoria circular (frente y detras)
     const fX = cx + r * cos;
@@ -226,11 +245,21 @@ function updateCoil() {
     conductorFront.setAttribute('x2', frontX);
     conductorFront.setAttribute('y1', cy - h);
     conductorFront.setAttribute('y2', cy + h);
+    conductorFront.setAttribute('stroke-width', strokeF);
 
     conductorBack.setAttribute('x1', backX);
     conductorBack.setAttribute('x2', backX);
     conductorBack.setAttribute('y1', cy - h);
     conductorBack.setAttribute('y2', cy + h);
+    conductorBack.setAttribute('stroke-width', strokeB);
+
+    // Indicador de rotacion: el circulo y la flecha siguen al radio del rotor
+    const r2 = r - 12;
+    rotCircle.setAttribute('r', r2);
+    const arcTo = Math.PI / 3;            // 60 grados en sentido horario
+    const ex = cx + r2 * Math.cos(arcTo);
+    const ey = cy + r2 * Math.sin(arcTo);
+    rotArc.setAttribute('d', `M ${cx + r2} ${cy} A ${r2} ${r2} 0 0 1 ${ex} ${ey}`);
 
     // Brillo de la bobina segun corriente (calentamiento electrico)
     const intensity = Math.min(1, state.current / 2);

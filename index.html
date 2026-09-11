@@ -142,6 +142,9 @@
                                     <feMergeNode in="SourceGraphic"/>
                                 </feMerge>
                             </filter>
+                            <marker id="rotArrowHead" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+                                <path d="M0,0 L10,5 L0,10 z" fill="#8899bb" opacity="0.7"/>
+                            </marker>
                         </defs>
 
                         <!-- Background grid -->
@@ -223,10 +226,8 @@
                             <line id="axisLine" x1="300" y1="165" x2="300" y2="345" stroke="rgba(255,255,255,0.15)" stroke-width="1" stroke-dasharray="3,5"/>
                             <!-- Flecha de sentido de rotacion -->
                             <g id="rotationArrow" opacity="0.4">
-                                <path d="M 342 213 A 48 48 0 0 1 342 297" fill="none" stroke="#8899bb" stroke-width="2" stroke-linecap="round"/>
-                                <polygon points="342,297 331,284 353,284" fill="#8899bb"/>
-                                <path d="M 258 297 A 48 48 0 0 1 258 213" fill="none" stroke="#8899bb" stroke-width="2" stroke-linecap="round"/>
-                                <polygon points="258,213 269,226 247,226" fill="#8899bb"/>
+                                <circle id="rotCircle" cx="300" cy="255" r="48" fill="none" stroke="#8899bb" stroke-width="1" stroke-dasharray="2,7"/>
+                                <path id="rotArc" d="M 348 255 A 48 48 0 0 1 324 296.6" fill="none" stroke="#8899bb" stroke-width="2" marker-end="url(#rotArrowHead)"/>
                             </g>
                             <!-- Poligono de la bobina (proyeccion; JS actualiza sus vertices) -->
                             <polygon id="coilPoly" points="230,185 370,185 370,325 230,325" fill="rgba(255,170,0,0.06)" stroke="url(#coilGrad)" stroke-width="3" stroke-linejoin="round"/>
@@ -515,6 +516,185 @@
             </div>
         </div>
     </main>
+
+    <!-- Variables Effect Section -->
+    <section id="variables" class="variables-section">
+        <div class="variables-container">
+            <h2 class="section-title variables-title">Efecto de cada Variable</h2>
+            <p class="variables-intro">
+                Cada control del panel modifica una variable del motor. A continuacion se explica
+                que ocurre en las ecuaciones y que deberias observar en la animacion cuando aumentas
+                cada una de ellas. Prueba a mover los deslizadores mientras el motor esta en marcha
+                y comprueba los cambios en las lecturas.
+            </p>
+
+            <div class="variables-grid">
+
+                <!-- Voltaje -->
+                <div class="variable-card" data-var="v">
+                    <div class="variable-header">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                        </svg>
+                        <h3>Voltaje (V)</h3>
+                        <span class="badge badge-up">Sube todo</span>
+                    </div>
+                    <div class="variable-formula">I = (V &minus; E<sub>back</sub>) / R</div>
+                    <p>
+                        Aumenta la corriente que circula por la bobina (Ley de Ohm), lo que eleva la
+                        fuerza magnetica, el torque y la velocidad maxima de giro.
+                    </p>
+                    <ul class="variable-effects">
+                        <li><span class="arrow-up">&#9650;</span> Corriente I</li>
+                        <li><span class="arrow-up">&#9650;</span> Fuerza F</li>
+                        <li><span class="arrow-up">&#9650;</span> Torque &#964;</li>
+                        <li><span class="arrow-up">&#9650;</span> RPM (velocidad de giro)</li>
+                    </ul>
+                    <div class="variable-observa">
+                        <strong>En la animacion:</strong> la bobina brilla mas (mas corriente), la flecha
+                        de corriente se ve mas intensa, los simbolos de fuerza
+                        <span class="sym-front">&#x2299;</span>/<span class="sym-back">&#x2297;</span>
+                        crecen y el giro se acelera.
+                    </div>
+                </div>
+
+                <!-- Resistencia -->
+                <div class="variable-card" data-var="r">
+                    <div class="variable-header">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#7850ff" stroke-width="2">
+                            <path d="M4 12h3l2-5 3 10 3-10 2 5h3"/>
+                        </svg>
+                        <h3>Resistencia (R)</h3>
+                        <span class="badge badge-down">Frena el motor</span>
+                    </div>
+                    <div class="variable-formula">I = (V &minus; E<sub>back</sub>) / R</div>
+                    <p>
+                        Al aumentar la resistencia del bobinado, la corriente disminuye. Menos corriente
+                        significa menos fuerza y menos torque, por lo que el motor gira mas lento e
+                        incluso puede detenerse si la resistencia es muy alta.
+                    </p>
+                    <ul class="variable-effects">
+                        <li><span class="arrow-down">&#9660;</span> Corriente I</li>
+                        <li><span class="arrow-down">&#9660;</span> Fuerza F</li>
+                        <li><span class="arrow-down">&#9660;</span> Torque &#964;</li>
+                        <li><span class="arrow-down">&#9660;</span> RPM (velocidad de giro)</li>
+                    </ul>
+                    <div class="variable-observa">
+                        <strong>En la animacion:</strong> la bobina se oscurece (menos corriente), los
+                        simbolos de fuerza se encogen y el giro se vuelve lento. Con una R muy alta, el
+                        motor se detiene por completo.
+                    </div>
+                </div>
+
+                <!-- Campo magnetico -->
+                <div class="variable-card" data-var="b">
+                    <div class="variable-header">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#00aacc" stroke-width="2">
+                            <path d="M3 12h18M7 8v8M11 5v14M15 8v8M19 6v12"/>
+                        </svg>
+                        <h3>Campo Magnetico (B)</h3>
+                        <span class="badge badge-mix">Mas fuerza, menos RPM</span>
+                    </div>
+                    <div class="variable-formula">F = 2&middot;N&middot;B&middot;I&middot;L  &nbsp;&bull;&nbsp;  E<sub>back</sub> &#8733; B</div>
+                    <p>
+                        Al aumentar B, cada conductor experimenta mas fuerza de Lorentz y el motor
+                        arranca con mas torque. Sin embargo, tambien crece la fem inducida
+                        (back-EMF) que se opone al voltaje, por lo que la corriente neta a alta
+                        velocidad disminuye y el regimen de RPM maximas baja.
+                    </p>
+                    <ul class="variable-effects">
+                        <li><span class="arrow-up">&#9650;</span> Fuerza F y torque de arranque</li>
+                        <li><span class="arrow-up">&#9650;</span> Back-EMF (oposicion)</li>
+                        <li><span class="arrow-down">&#9660;</span> RPM maximas</li>
+                    </ul>
+                    <div class="variable-observa">
+                        <strong>En la animacion:</strong> las lineas de campo se vuelven mas brillantes,
+                        mas densas y fluyen mas rapido; los simbolos de fuerza se agrandan; el arranque
+                        es mas potente pero la velocidad final es menor.
+                    </div>
+                </div>
+
+                <!-- Longitud del conductor -->
+                <div class="variable-card" data-var="l">
+                    <div class="variable-header">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#44ff88" stroke-width="2">
+                            <line x1="8" y1="4" x2="8" y2="20"/><line x1="16" y1="4" x2="16" y2="20"/>
+                            <line x1="4" y1="20" x2="20" y2="20"/>
+                        </svg>
+                        <h3>Longitud del Conductor (L)</h3>
+                        <span class="badge badge-up">Mas fuerza</span>
+                    </div>
+                    <div class="variable-formula">F = 2&middot;N&middot;B&middot;I&middot;L</div>
+                    <p>
+                        Cuanto mayor es la longitud del conductor que atraviesa el campo magnetico,
+                        mayor es la fuerza de Lorentz para la misma corriente. El torque sube, pero la
+                        velocidad maxima no cambia porque L no influye en el back-EMF.
+                    </p>
+                    <ul class="variable-effects">
+                        <li><span class="arrow-up">&#9650;</span> Fuerza F</li>
+                        <li><span class="arrow-up">&#9650;</span> Torque &#964;</li>
+                        <li><span class="neutral">&#9650;&#9660;</span> RPM sin cambios</li>
+                    </ul>
+                    <div class="variable-observa">
+                        <strong>En la animacion:</strong> los conductores aprovechan mejor el campo: los
+                        simbolos de fuerza crecen, se consigue el mismo giro con menos corriente.
+                    </div>
+                </div>
+
+                <!-- Vueltas -->
+                <div class="variable-card" data-var="n">
+                    <div class="variable-header">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ffaa00" stroke-width="2">
+                            <path d="M12 4a8 8 0 1 0 8 8"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2"/>
+                        </svg>
+                        <h3>Vueltas de la Bobina (N)</h3>
+                        <span class="badge badge-up">Mas fuerza</span>
+                    </div>
+                    <div class="variable-formula">F = 2&middot;N&middot;B&middot;I&middot;L</div>
+                    <p>
+                        Cada espira adicional aporta fuerza a la misma corriente: es como si el
+                        conductor pasara N veces por el campo. La fuerza y el torque crecen
+                        proporcionalmente a N. La velocidad maxima del modelo no se ve afectada.
+                    </p>
+                    <ul class="variable-effects">
+                        <li><span class="arrow-up">&#9650;</span> Fuerza F</li>
+                        <li><span class="arrow-up">&#9650;</span> Torque &#964;</li>
+                        <li><span class="neutral">&#9650;&#9660;</span> RPM sin cambios</li>
+                    </ul>
+                    <div class="variable-observa">
+                        <strong>En la animacion:</strong> la bobina se dibuja mas robusta y luminosa con
+                        mas vueltas, y el par de giro se siente mas potente.
+                    </div>
+                </div>
+
+                <!-- Radio del eje -->
+                <div class="variable-card" data-var="r">
+                    <div class="variable-header">
+                        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ff4466" stroke-width="2">
+                            <circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/>
+                        </svg>
+                        <h3>Radio del Eje (r)</h3>
+                        <span class="badge badge-up">Mas torque</span>
+                    </div>
+                    <div class="variable-formula">&#964; = F &middot; r</div>
+                    <p>
+                        El radio funciona como el brazo de palanca del torque: a mayor radio, la misma
+                        fuerza produce un mayor giro. El motor gana torque real en el eje, lo que
+                        permite mover cargas mas pesadas.
+                    </p>
+                    <ul class="variable-effects">
+                        <li><span class="arrow-up">&#9650;</span> Torque &#964;</li>
+                        <li><span class="neutral">&#9650;&#9660;</span> RPM sin cambios</li>
+                    </ul>
+                    <div class="variable-observa">
+                        <strong>En la animacion:</strong> la bobina describe una circunferencia mas
+                        amplia (el rotor se ve mas grande) y el giro transmite mas fuerza al eje.
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
 
     <!-- Theory Section -->
     <section id="teoria" class="theory-section">
