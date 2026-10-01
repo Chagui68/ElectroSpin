@@ -757,6 +757,9 @@ function restoreSafeParameters() {
     updateReadings();
     updateFieldLines();
     updateCoil();
+    if (window.motor3D && motor3D.initialized) {
+        motor3D.updateGeometry(state);
+    }
     closeHazardModal();
 }
 
@@ -778,6 +781,9 @@ function rearmBreaker() {
     updateSliderLabels();
     updateReadings();
     updateCoil();
+    if (window.motor3D && motor3D.initialized) {
+        motor3D.updateGeometry(state);
+    }
 }
 
 /**
@@ -850,6 +856,9 @@ function applyPreset(presetType) {
     updateReadings();
     updateFieldLines();
     updateCoil();
+    if (window.motor3D && motor3D.initialized) {
+        motor3D.updateGeometry(state);
+    }
 }
 
 /**
@@ -1103,6 +1112,11 @@ function animate(time) {
     updateDynamicSparks();
     updateDynamicSmoke();
 
+    // Actualizar renderizado 3D WebGL
+    if (window.motor3D && motor3D.initialized) {
+        motor3D.update(state, dt);
+    }
+
     requestAnimationFrame(animate);
 }
 
@@ -1191,6 +1205,9 @@ function resetSimulation() {
     updateReadings();
     updateFieldLines();
     updateCoil();
+    if (window.motor3D && motor3D.initialized) {
+        motor3D.updateGeometry(state);
+    }
 }
 
 function updateSliderLabels() {
@@ -1229,6 +1246,9 @@ function setupControls() {
             updateReadings();
             updateFieldLines();
             updateCoil();
+            if (window.motor3D && motor3D.initialized) {
+                motor3D.updateGeometry(state);
+            }
         });
     }
 
@@ -1245,6 +1265,62 @@ function setupControls() {
             closeHazardModal();
         }
     });
+}
+
+/**
+ * =============================================
+ * Controladores de la Vista 3D WebGL
+ * =============================================
+ */
+function switchViewerMode(mode) {
+    const wrapper3D = document.getElementById('motor3DWrapper');
+    const wrapper2D = document.getElementById('motorSvgWrapper');
+    const btn3D = document.getElementById('btnMode3D');
+    const btn2D = document.getElementById('btnMode2D');
+
+    if (mode === '3d') {
+        wrapper3D.style.display = 'block';
+        wrapper2D.style.display = 'none';
+        btn3D.classList.add('active');
+        btn2D.classList.remove('active');
+        if (window.motor3D) motor3D.onResize();
+    } else {
+        wrapper3D.style.display = 'none';
+        wrapper2D.style.display = 'block';
+        btn3D.classList.remove('active');
+        btn2D.classList.add('active');
+    }
+}
+
+function set3DCam(viewType) {
+    if (!window.motor3D) return;
+    motor3D.setCameraView(viewType);
+    document.querySelectorAll('.cam-presets .cam-btn').forEach(b => b.classList.remove('active'));
+
+    const idMap = {
+        'isometric': 'camIso',
+        'front': 'camFront',
+        'top': 'camTop',
+        'commutator': 'camComm'
+    };
+    const btn = document.getElementById(idMap[viewType]);
+    if (btn) btn.classList.add('active');
+}
+
+function toggleVectorsOverlay() {
+    if (!window.motor3D) return;
+    const btn = document.getElementById('btnVectorsToggle');
+    const nextState = !motor3D.showVectors;
+    motor3D.toggleVectors(nextState);
+    btn.textContent = nextState ? 'Vectores: ON' : 'Vectores: OFF';
+    btn.classList.toggle('active', nextState);
+}
+
+function toggle3DAutoRotate() {
+    if (!window.motor3D) return;
+    const btn = document.getElementById('btnAutoRotate');
+    const active = motor3D.toggleAutoRotate();
+    btn.classList.toggle('active', active);
 }
 
 function setupScrollSpy() {
@@ -1275,6 +1351,13 @@ function init() {
     updateReadings();
     updateFieldLines();
     updateCoil();
+
+    // Inicializar visualizador 3D WebGL (Three.js)
+    const canvas3D = document.getElementById('motor3DCanvas');
+    if (canvas3D && window.motor3D) {
+        motor3D.init(canvas3D);
+        motor3D.updateGeometry(state);
+    }
 
     requestAnimationFrame((t) => {
         lastTime = t;
