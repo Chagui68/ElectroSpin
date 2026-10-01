@@ -316,29 +316,90 @@ class Motor3D {
         this.commutatorGroup.add(insulator);
 
         // =============================================
-        // Escobillas de Grafito (Fijas en el Estator)
+        // Escobillas de Grafito y Bornes de Alimentación DC
         // =============================================
         const brushMat = new THREE.MeshStandardMaterial({ color: 0x334155, metalness: 0.2, roughness: 0.85 });
         const brushHolderMat = new THREE.MeshStandardMaterial({ color: 0xd97706, metalness: 0.8, roughness: 0.3 });
+        const terminalMetalMat = new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.9, roughness: 0.2 });
+        const wirePosMat = new THREE.MeshStandardMaterial({ color: 0xff2a4d, roughness: 0.5 });
+        const wireNegMat = new THREE.MeshStandardMaterial({ color: 0x0284c7, roughness: 0.5 });
         const brushGeo = new THREE.BoxGeometry(0.28, 0.32, 0.35);
 
-        // Escobilla izquierda
+        // Escobilla izquierda (Polo Positivo +)
         const brushLeft = new THREE.Mesh(brushGeo, brushMat);
         brushLeft.position.set(-0.62, -2.5, 0);
         this.statorGroup.add(brushLeft);
 
-        const brushHolderL = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.18, 0.2), brushHolderMat);
+        const brushHolderL = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.18, 0.22), brushHolderMat);
         brushHolderL.position.set(-0.9, -2.5, 0);
         this.statorGroup.add(brushHolderL);
 
-        // Escobilla derecha
+        // Borne terminal positivo (+) de latón
+        const terminalL = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.26, 16), terminalMetalMat);
+        terminalL.position.set(-1.14, -2.5, 0);
+        this.statorGroup.add(terminalL);
+
+        // Placas de polaridad en el borne izquierdo (+)
+        this.attachPolarityBadge(brushHolderL, '+', 'POS', '#ff3355', 0.42, 0.13);
+
+        // Escobilla derecha (Polo Negativo −)
         const brushRight = new THREE.Mesh(brushGeo, brushMat);
         brushRight.position.set(0.62, -2.5, 0);
         this.statorGroup.add(brushRight);
 
-        const brushHolderR = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.18, 0.2), brushHolderMat);
+        const brushHolderR = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.18, 0.22), brushHolderMat);
         brushHolderR.position.set(0.9, -2.5, 0);
         this.statorGroup.add(brushHolderR);
+
+        // Borne terminal negativo (−) de latón
+        const terminalR = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.26, 16), terminalMetalMat);
+        terminalR.position.set(1.14, -2.5, 0);
+        this.statorGroup.add(terminalR);
+
+        // Placas de polaridad en el borne derecho (−)
+        this.attachPolarityBadge(brushHolderR, '−', 'NEG', '#38bdf8', 0.42, 0.13);
+
+        // =============================================
+        // Regleta de Alimentación DC en la Base del Estator
+        // =============================================
+        const dcBlockMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, metalness: 0.7, roughness: 0.35 });
+        const dcBlockGeo = new THREE.BoxGeometry(2.3, 0.32, 0.65);
+        const dcBlock = new THREE.Mesh(dcBlockGeo, dcBlockMat);
+        dcBlock.position.set(0, -3.42, 0.75);
+        this.statorGroup.add(dcBlock);
+
+        // Borne banana positivo rojo (+) en la regleta base
+        const bananaGeo = new THREE.CylinderGeometry(0.1, 0.1, 0.24, 16);
+        const bananaPos = new THREE.Mesh(bananaGeo, new THREE.MeshStandardMaterial({ color: 0xd90429, metalness: 0.3, roughness: 0.3 }));
+        bananaPos.position.set(-0.68, -3.22, 0.75);
+        this.statorGroup.add(bananaPos);
+        this.attachPolarityBadge(bananaPos, '+', '12V', '#ff3355', 0.26, 0.12);
+
+        // Borne banana negativo azul (−) en la regleta base
+        const bananaNeg = new THREE.Mesh(bananaGeo, new THREE.MeshStandardMaterial({ color: 0x0284c7, metalness: 0.3, roughness: 0.3 }));
+        bananaNeg.position.set(0.68, -3.22, 0.75);
+        this.statorGroup.add(bananaNeg);
+        this.attachPolarityBadge(bananaNeg, '−', 'GND', '#38bdf8', 0.26, 0.12);
+
+        // Cables flexibles de conexión conectando bornas con escobillas
+        const wireRadius = 0.04;
+        const curvePos = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(-1.14, -2.5, 0),
+            new THREE.Vector3(-1.25, -2.9, 0.35),
+            new THREE.Vector3(-0.95, -3.28, 0.68),
+            new THREE.Vector3(-0.68, -3.22, 0.75)
+        ]);
+        const wirePosMesh = new THREE.Mesh(new THREE.TubeGeometry(curvePos, 20, wireRadius, 8, false), wirePosMat);
+        this.statorGroup.add(wirePosMesh);
+
+        const curveNeg = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(1.14, -2.5, 0),
+            new THREE.Vector3(1.25, -2.9, 0.35),
+            new THREE.Vector3(0.95, -3.28, 0.68),
+            new THREE.Vector3(0.68, -3.22, 0.75)
+        ]);
+        const wireNegMesh = new THREE.Mesh(new THREE.TubeGeometry(curveNeg, 20, wireRadius, 8, false), wireNegMat);
+        this.statorGroup.add(wireNegMesh);
 
         // =============================================
         // Flechas Vectoriales Dinámicas en 3D
@@ -416,6 +477,65 @@ class Motor3D {
         topPlate.position.set(0, 2.62, 0);
         topPlate.rotation.set(-Math.PI / 2, 0, 0);
         parentMesh.add(topPlate);
+    }
+
+    attachPolarityBadge(parentMesh, symbol, subtitle, accentColor, size = 0.38, zOffset = 0.12) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 256;
+        canvas.height = 256;
+        const ctx = canvas.getContext('2d');
+
+        // Círculo de fondo con estilo técnico oscuro
+        ctx.fillStyle = 'rgba(8, 12, 22, 0.95)';
+        ctx.beginPath();
+        ctx.arc(128, 128, 116, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Borde circular de neón brillante
+        ctx.lineWidth = 14;
+        ctx.strokeStyle = accentColor;
+        ctx.shadowColor = accentColor;
+        ctx.shadowBlur = 20;
+        ctx.stroke();
+
+        // Símbolo grande (+ o −)
+        ctx.shadowBlur = 30;
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 130px Orbitron, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(symbol, 128, 110);
+
+        // Subtítulo técnico
+        ctx.shadowBlur = 10;
+        ctx.fillStyle = accentColor;
+        ctx.font = 'bold 30px Orbitron, sans-serif';
+        ctx.fillText(subtitle, 128, 195);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.anisotropy = 4;
+
+        const plateMat = new THREE.MeshBasicMaterial({
+            map: texture,
+            transparent: true,
+            depthWrite: false,
+            polygonOffset: true,
+            polygonOffsetFactor: -2,
+            polygonOffsetUnits: -2
+        });
+
+        const plateGeo = new THREE.PlaneGeometry(size, size);
+
+        // Placa frontal (mirando a +Z)
+        const frontPlate = new THREE.Mesh(plateGeo, plateMat);
+        frontPlate.position.set(0, 0, zOffset);
+        parentMesh.add(frontPlate);
+
+        // Placa trasera (mirando a -Z)
+        const backPlate = new THREE.Mesh(plateGeo, plateMat);
+        backPlate.position.set(0, 0, -zOffset);
+        backPlate.rotation.set(0, Math.PI, 0);
+        parentMesh.add(backPlate);
     }
 
     buildVectorArrows() {

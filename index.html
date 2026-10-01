@@ -374,9 +374,25 @@
                             <text x="300" y="415" text-anchor="middle" fill="#aa8833" font-family="JetBrains Mono" font-size="9">Conmutador</text>
                         </g>
 
-                        <!-- Brushes (Escobillas de carbón) -->
-                        <rect id="brushLeft" x="260" y="378" width="12" height="14" rx="2" fill="#555" stroke="#777" stroke-width="1"/>
-                        <rect id="brushRight" x="328" y="378" width="12" height="14" rx="2" fill="#555" stroke="#777" stroke-width="1"/>
+                        <!-- Brushes (Escobillas de carbón) con Bornes de Polaridad (+ / −) -->
+                        <g id="brushesGroup">
+                            <rect id="brushLeft" x="260" y="378" width="12" height="14" rx="2" fill="#475569" stroke="#94a3b8" stroke-width="1"/>
+                            <rect id="brushRight" x="328" y="378" width="12" height="14" rx="2" fill="#475569" stroke="#94a3b8" stroke-width="1"/>
+                            
+                            <!-- Distintivo Polo Positivo (+) -->
+                            <g id="badgePolarityPos" transform="translate(244, 385)">
+                                <circle cx="0" cy="0" r="8" fill="#180b12" stroke="#ff3355" stroke-width="1.5"/>
+                                <text x="0" y="3.5" text-anchor="middle" fill="#ff4466" font-family="Orbitron, monospace" font-size="11" font-weight="bold">+</text>
+                                <text x="0" y="-12" text-anchor="middle" fill="#ff6688" font-family="JetBrains Mono, monospace" font-size="7.5" font-weight="bold">POLO (+)</text>
+                            </g>
+
+                            <!-- Distintivo Polo Negativo (−) -->
+                            <g id="badgePolarityNeg" transform="translate(356, 385)">
+                                <circle cx="0" cy="0" r="8" fill="#081528" stroke="#38bdf8" stroke-width="1.5"/>
+                                <text x="0" y="3" text-anchor="middle" fill="#38bdf8" font-family="Orbitron, monospace" font-size="12" font-weight="bold">−</text>
+                                <text x="0" y="-12" text-anchor="middle" fill="#38bdf8" font-family="JetBrains Mono, monospace" font-size="7.5" font-weight="bold">POLO (−)</text>
+                            </g>
+                        </g>
 
                         <!-- Dynamic Electrical Arc & Spark Particles (Generated during arcing/overvoltage) -->
                         <g id="sparksGroup" opacity="0"></g>
@@ -385,16 +401,32 @@
                         <rect x="280" y="455" width="40" height="15" rx="3" fill="#444" stroke="#555" stroke-width="1"/>
                         <text x="300" y="485" text-anchor="middle" fill="#666" font-family="JetBrains Mono" font-size="9">Eje de rotación</text>
 
-                        <!-- Voltage source indicator -->
+                        <!-- Voltage source & DC wiring (Circuito Eléctrico con Bornes + / -) -->
                         <g id="voltageSource">
-                            <rect x="20" y="440" width="85" height="35" rx="5" fill="rgba(0,200,255,0.1)" stroke="rgba(0,200,255,0.3)" stroke-width="1"/>
-                            <text x="62" y="455" text-anchor="middle" fill="#00c8ff" font-family="JetBrains Mono" font-size="9">Fuente DC</text>
-                            <text id="voltageLabelSVG" x="62" y="468" text-anchor="middle" fill="#00c8ff" font-family="JetBrains Mono" font-size="11" font-weight="bold">12.0 V</text>
-                            <!-- Wires -->
-                            <line x1="62" y1="440" x2="62" y2="400" stroke="#00c8ff" stroke-width="1.5" opacity="0.5"/>
-                            <line x1="62" y1="400" x2="266" y2="400" stroke="#00c8ff" stroke-width="1.5" opacity="0.5" stroke-dasharray="4,3"/>
-                            <line x1="538" y1="400" x2="538" y2="440" stroke="#00c8ff" stroke-width="1.5" opacity="0.5"/>
-                            <line x1="334" y1="400" x2="538" y2="400" stroke="#00c8ff" stroke-width="1.5" opacity="0.5" stroke-dasharray="4,3"/>
+                            <!-- Carcasa de la Fuente de Alimentación DC -->
+                            <rect x="18" y="432" width="112" height="48" rx="6" fill="#0b1329" stroke="rgba(0,200,255,0.4)" stroke-width="1.5"/>
+                            <text x="74" y="446" text-anchor="middle" fill="#94a3b8" font-family="JetBrains Mono" font-size="9" letter-spacing="1">FUENTE DC</text>
+                            <text id="voltageLabelSVG" x="74" y="464" text-anchor="middle" fill="#38bdf8" font-family="Orbitron" font-size="13" font-weight="bold">12.0 V</text>
+                            
+                            <!-- Borne Positivo (+) en Fuente -->
+                            <circle cx="36" cy="432" r="6" fill="#ff3355" stroke="#ffffff" stroke-width="1.2"/>
+                            <text x="36" y="423" text-anchor="middle" fill="#ff4466" font-family="Orbitron" font-size="10" font-weight="bold">+</text>
+
+                            <!-- Borne Negativo (−) en Fuente -->
+                            <circle cx="112" cy="432" r="6" fill="#0284c7" stroke="#ffffff" stroke-width="1.2"/>
+                            <text x="112" y="423" text-anchor="middle" fill="#38bdf8" font-family="Orbitron" font-size="11" font-weight="bold">−</text>
+
+                            <!-- Cable Positivo (Alimentación - Rojo) hacia Escobilla Izquierda (+) -->
+                            <path d="M 36 432 L 36 402 L 260 402 L 260 392" fill="none" stroke="#ff3355" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M 36 432 L 36 402 L 260 402 L 260 392" fill="none" stroke="#ff88a3" stroke-width="1.2" stroke-dasharray="6,4" opacity="0.85">
+                                <animate attributeName="stroke-dashoffset" from="20" to="0" dur="0.8s" repeatCount="indefinite"/>
+                            </path>
+
+                            <!-- Cable Negativo (Retorno Tierra - Azul) desde Escobilla Derecha (−) -->
+                            <path d="M 334 392 L 334 424 L 112 424 L 112 432" fill="none" stroke="#0284c7" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M 334 392 L 334 424 L 112 424 L 112 432" fill="none" stroke="#38bdf8" stroke-width="1.2" stroke-dasharray="6,4" opacity="0.85">
+                                <animate attributeName="stroke-dashoffset" from="0" to="20" dur="0.8s" repeatCount="indefinite"/>
+                            </path>
                         </g>
 
                         <!-- RPM Display -->
@@ -529,6 +561,14 @@
                 <!-- Legend -->
                 <div class="motor-legend">
                     <div class="legend-item">
+                        <span class="legend-color" style="background:#ff3355"></span>
+                        <span>Borne Positivo (+) / Entrada DC</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background:#0284c7"></span>
+                        <span>Borne Negativo (−) / Retorno GND</span>
+                    </div>
+                    <div class="legend-item">
                         <span class="legend-color" style="background:#00c8ff"></span>
                         <span>Campo Magnético (B)</span>
                     </div>
@@ -551,7 +591,7 @@
                 </div>
 
                 <p class="motor-note">
-                    <strong>Vista de perfil:</strong> la bobina gira sobre el eje vertical central. Por la regla de la mano derecha (\(F = I \times B\)), la fuerza sobre cada conductor es perpendicular al plano. El conmutador invierte el flujo cada 180&deg; para mantener el torque en el mismo sentido.
+                    <strong>Vista y Circuito:</strong> La alimentación DC ingresa por el <strong>Borne Positivo (+)</strong> (escobilla izquierda) y retorna al circuito por el <strong>Borne Negativo (−)</strong> (escobilla derecha). La espira gira sobre el eje vertical central. Por la regla de la mano derecha (\(F = I \times B\)), la fuerza de Lorentz sobre cada conductor impulsa la rotación. El conmutador invierte el flujo cada 180&deg; para mantener el torque en el mismo sentido de giro.
                 </p>
             </div>
 
