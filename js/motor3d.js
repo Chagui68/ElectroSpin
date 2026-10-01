@@ -198,18 +198,21 @@ class Motor3D {
         this.magnetNMesh = new THREE.Mesh(magnetGeo, this.magnetNMaterial);
         this.magnetNMesh.position.set(-3.6, 0.2, 0);
         this.magnetNMesh.castShadow = true;
+        this.magnetNMesh.receiveShadow = true;
         this.statorGroup.add(this.magnetNMesh);
 
-        // Letra N y S en 3D (Texturas en sprite o canvas)
-        this.addMagnetLabel(this.magnetNMesh, 'N', '#ff8888', { x: 0.82, y: 0, z: 0 });
+        // Placas identificadoras N en las caras exteriores del imán
+        this.attachMagnetFaceLabels(this.magnetNMesh, 'N', 'NORTE', '#ff4466');
 
         // Imán Sur (Derecha)
         this.magnetSMesh = new THREE.Mesh(magnetGeo, this.magnetSMaterial);
         this.magnetSMesh.position.set(3.6, 0.2, 0);
         this.magnetSMesh.castShadow = true;
+        this.magnetSMesh.receiveShadow = true;
         this.statorGroup.add(this.magnetSMesh);
 
-        this.addMagnetLabel(this.magnetSMesh, 'S', '#88bbff', { x: -0.82, y: 0, z: 0 });
+        // Placas identificadoras S en las caras exteriores del imán
+        this.attachMagnetFaceLabels(this.magnetSMesh, 'S', 'SUR', '#38bdf8');
 
         // Yugo magnético exterior (arco de hierro que cierra el flujo del estator)
         const yokeMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.4 });
@@ -343,27 +346,76 @@ class Motor3D {
         this.buildVectorArrows();
     }
 
-    addMagnetLabel(parentMesh, text, colorHex, pos) {
+    attachMagnetFaceLabels(parentMesh, letter, subtitle, accentColor) {
+        // Generar textura de alta resolución en canvas 512x512
         const canvas = document.createElement('canvas');
-        canvas.width = 128;
-        canvas.height = 128;
+        canvas.width = 512;
+        canvas.height = 512;
         const ctx = canvas.getContext('2d');
-        ctx.fillStyle = 'rgba(0,0,0,0)';
-        ctx.fillRect(0, 0, 128, 128);
+
+        // Fondo oscuro de placa técnica
+        ctx.fillStyle = 'rgba(10, 15, 26, 0.9)';
+        ctx.beginPath();
+        if (ctx.roundRect) {
+            ctx.roundRect(16, 16, 480, 480, 40);
+        } else {
+            ctx.rect(16, 16, 480, 480);
+        }
+        ctx.fill();
+
+        // Marco neon brillante
+        ctx.lineWidth = 16;
+        ctx.strokeStyle = accentColor;
+        ctx.shadowColor = accentColor;
+        ctx.shadowBlur = 24;
+        ctx.stroke();
+
+        // Letra principal grande ("N" o "S")
+        ctx.shadowBlur = 35;
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 76px Orbitron, Arial';
+        ctx.font = '900 260px Orbitron, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.shadowColor = colorHex;
-        ctx.shadowBlur = 14;
-        ctx.fillText(text, 64, 64);
+        ctx.fillText(letter, 256, 215);
+
+        // Subtítulo ("NORTE" o "SUR")
+        ctx.shadowBlur = 12;
+        ctx.fillStyle = accentColor;
+        ctx.font = 'bold 50px Orbitron, sans-serif';
+        ctx.fillText(subtitle, 256, 385);
 
         const texture = new THREE.CanvasTexture(canvas);
-        const spriteMat = new THREE.SpriteMaterial({ map: texture, transparent: true });
-        const sprite = new THREE.Sprite(spriteMat);
-        sprite.scale.set(1.4, 1.4, 1);
-        sprite.position.set(pos.x, pos.y, pos.z);
-        parentMesh.add(sprite);
+        texture.anisotropy = 4;
+
+        // Material con polygonOffset y depthWrite para evitar z-fighting
+        const plateMat = new THREE.MeshBasicMaterial({
+            map: texture,
+            transparent: true,
+            depthWrite: false,
+            polygonOffset: true,
+            polygonOffsetFactor: -2,
+            polygonOffsetUnits: -2
+        });
+
+        const plateGeo = new THREE.PlaneGeometry(1.35, 1.35);
+
+        // 1. Placa FRONTAL (mirando a +Z hacia el usuario, en z = +1.62 sobre la superficie)
+        const frontPlate = new THREE.Mesh(plateGeo, plateMat);
+        frontPlate.position.set(0, 0.4, 1.62);
+        frontPlate.rotation.set(0, 0, 0);
+        parentMesh.add(frontPlate);
+
+        // 2. Placa TRASERA (mirando a -Z, en z = -1.62)
+        const backPlate = new THREE.Mesh(plateGeo, plateMat);
+        backPlate.position.set(0, 0.4, -1.62);
+        backPlate.rotation.set(0, Math.PI, 0);
+        parentMesh.add(backPlate);
+
+        // 3. Placa SUPERIOR (mirando a +Y, en y = +2.62)
+        const topPlate = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 1.2), plateMat);
+        topPlate.position.set(0, 2.62, 0);
+        topPlate.rotation.set(-Math.PI / 2, 0, 0);
+        parentMesh.add(topPlate);
     }
 
     buildVectorArrows() {
