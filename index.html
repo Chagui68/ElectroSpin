@@ -3,33 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ElectroSpin - Simulador de Motor DC</title>
+    <title>ElectroSpin - Simulador Avanzado de Motor DC</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Decorative SVG Background -->
-    <svg class="bg-decoration" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+    <svg class="bg-decoration" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
         <defs>
             <radialGradient id="glow1" cx="20%" cy="30%" r="40%">
-                <stop offset="0%" stop-color="rgba(0,200,255,0.08)"/>
+                <stop offset="0%" stop-color="rgba(0,200,255,0.09)"/>
                 <stop offset="100%" stop-color="rgba(0,200,255,0)"/>
             </radialGradient>
             <radialGradient id="glow2" cx="80%" cy="70%" r="35%">
-                <stop offset="0%" stop-color="rgba(120,80,255,0.06)"/>
+                <stop offset="0%" stop-color="rgba(120,80,255,0.07)"/>
                 <stop offset="100%" stop-color="rgba(120,80,255,0)"/>
             </radialGradient>
-            <linearGradient id="fieldLine" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stop-color="rgba(0,200,255,0.4)"/>
-                <stop offset="50%" stop-color="rgba(0,200,255,0.15)"/>
-                <stop offset="100%" stop-color="rgba(0,200,255,0.4)"/>
-            </linearGradient>
+            <radialGradient id="glowHazard" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="rgba(255,68,102,0.15)"/>
+                <stop offset="100%" stop-color="rgba(255,68,102,0)"/>
+            </radialGradient>
         </defs>
         <rect width="100%" height="100%" fill="url(#glow1)"/>
         <rect width="100%" height="100%" fill="url(#glow2)"/>
+        <rect id="bgHazardGlow" width="100%" height="100%" fill="url(#glowHazard)" opacity="0"/>
+        
         <!-- Animated magnetic field lines in background -->
-        <g class="bg-field-lines" opacity="0.3">
+        <g class="bg-field-lines" opacity="0.32">
             <path d="M-100,200 Q300,180 500,250 T1100,200 T1600,220" fill="none" stroke="rgba(0,200,255,0.2)" stroke-width="1">
                 <animate attributeName="d" dur="8s" repeatCount="indefinite"
                     values="M-100,200 Q300,180 500,250 T1100,200 T1600,220;
@@ -51,20 +52,20 @@
         </g>
         <!-- Floating particles -->
         <g class="particles">
-            <circle cx="100" cy="150" r="2" fill="rgba(0,200,255,0.4)">
+            <circle cx="100" cy="150" r="2" fill="rgba(0,200,255,0.5)">
                 <animate attributeName="cy" dur="6s" values="150;100;150" repeatCount="indefinite"/>
                 <animate attributeName="opacity" dur="6s" values="0.4;0.8;0.4" repeatCount="indefinite"/>
             </circle>
-            <circle cx="350" cy="400" r="1.5" fill="rgba(120,80,255,0.3)">
+            <circle cx="350" cy="400" r="1.5" fill="rgba(120,80,255,0.4)">
                 <animate attributeName="cy" dur="8s" values="400;350;400" repeatCount="indefinite"/>
             </circle>
-            <circle cx="900" cy="200" r="2" fill="rgba(0,200,255,0.3)">
+            <circle cx="900" cy="200" r="2" fill="rgba(0,200,255,0.4)">
                 <animate attributeName="cy" dur="7s" values="200;150;200" repeatCount="indefinite"/>
             </circle>
-            <circle cx="1200" cy="500" r="1.5" fill="rgba(120,80,255,0.25)">
+            <circle cx="1200" cy="500" r="1.5" fill="rgba(120,80,255,0.35)">
                 <animate attributeName="cy" dur="9s" values="500;440;500" repeatCount="indefinite"/>
             </circle>
-            <circle cx="600" cy="700" r="2" fill="rgba(0,200,255,0.2)">
+            <circle cx="600" cy="700" r="2" fill="rgba(0,200,255,0.3)">
                 <animate attributeName="cy" dur="5s" values="700;660;700" repeatCount="indefinite"/>
             </circle>
         </g>
@@ -74,7 +75,7 @@
     <header class="header">
         <div class="header-content">
             <div class="logo-area">
-                <svg class="logo-icon" viewBox="0 0 60 60" width="60" height="60">
+                <svg class="logo-icon" viewBox="0 0 60 60" width="56" height="56" aria-hidden="true">
                     <defs>
                         <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                             <stop offset="0%" stop-color="#00c8ff"/>
@@ -91,13 +92,34 @@
                 </svg>
                 <div>
                     <h1 class="title">ElectroSpin</h1>
-                    <p class="subtitle">Simulador Interactivo de Motor DC</p>
+                    <p class="subtitle">Simulador Físico e Interactivo de Motor DC</p>
                 </div>
             </div>
+
+            <!-- Header Quick Actions & Safety Badge -->
+            <div class="header-controls">
+                <button id="soundToggleBtn" class="sound-toggle-btn" onclick="toggleSound()" title="Activar/Silenciar efectos de sonido">
+                    <svg id="soundIconOn" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                    </svg>
+                    <svg id="soundIconOff" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                        <line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+                    </svg>
+                    <span id="soundText">Audio: Desactivado</span>
+                </button>
+
+                <div class="header-safety-badge" id="headerSafetyBadge" onclick="openHazardModal()" title="Clic para ver diagnóstico de seguridad en vivo">
+                    <span class="safety-indicator-dot safe" id="headerSafetyDot"></span>
+                    <span id="headerSafetyText">Estado: Seguro</span>
+                </div>
+            </div>
+
             <nav class="nav-links">
                 <a href="#simulador" class="nav-link active">Simulador</a>
                 <a href="#variables" class="nav-link">Efecto de las Variables</a>
-                <a href="#teoria" class="nav-link">Teoria</a>
+                <a href="#teoria" class="nav-link">Marco Teórico</a>
                 <a href="#acerca" class="nav-link">Acerca de</a>
             </nav>
         </div>
@@ -105,17 +127,57 @@
 
     <!-- Main Simulator Section -->
     <main id="simulador" class="simulator-section">
+        
+        <!-- Presets Bar / Escenarios Rápidos -->
+        <div class="presets-bar">
+            <div class="presets-intro">
+                <span class="presets-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    Escenarios de Prueba:
+                </span>
+            </div>
+            <div class="presets-buttons">
+                <button class="preset-btn active" id="presetNominal" onclick="applyPreset('nominal')">
+                    <span class="preset-dot green"></span>
+                    Nominal Seguro (12V)
+                </button>
+                <button class="preset-btn preset-warn" id="presetOvervoltage" onclick="applyPreset('overvoltage')">
+                    <span class="preset-dot yellow"></span>
+                    ⚡ Sobrevoltaje (24V)
+                </button>
+                <button class="preset-btn preset-danger" id="presetThermal" onclick="applyPreset('thermal')">
+                    <span class="preset-dot red"></span>
+                    🔥 Sobrecarga Térmica (30V, 1Ω)
+                </button>
+                <button class="preset-btn preset-warn" id="presetOverspeed" onclick="applyPreset('overspeed')">
+                    <span class="preset-dot purple"></span>
+                    🌪️ Sobrevelocidad Crítica
+                </button>
+                <button class="preset-btn" id="presetHighEff" onclick="applyPreset('highEff')">
+                    <span class="preset-dot blue"></span>
+                    💡 Máxima Eficiencia
+                </button>
+            </div>
+        </div>
+
         <div class="simulator-layout">
             <!-- Motor Visualization -->
-            <div class="motor-container">
+            <div class="motor-container" id="motorContainerCard">
                 <div class="motor-header">
-                    <h2 class="section-title">Vista del Motor DC</h2>
-                    <div class="motor-status">
+                    <div class="motor-header-left">
+                        <h2 class="section-title">Vista del Motor DC</h2>
+                        <span class="model-badge">Modelo Didáctico de Espira</span>
+                    </div>
+                    <div class="motor-status" id="motorStatusBadge">
                         <span class="status-dot" id="statusDot"></span>
                         <span id="statusText">Detenido</span>
                     </div>
                 </div>
-                <div class="motor-svg-wrapper">
+
+                <div class="motor-svg-wrapper" id="motorSvgWrapper">
                     <svg id="motorSVG" viewBox="0 0 600 500" class="motor-svg">
                         <defs>
                             <linearGradient id="magnetN" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -127,8 +189,8 @@
                                 <stop offset="100%" stop-color="#5577ff"/>
                             </linearGradient>
                             <linearGradient id="coilGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                <stop offset="0%" stop-color="#ffaa00"/>
-                                <stop offset="100%" stop-color="#ff8800"/>
+                                <stop id="coilGradStop1" offset="0%" stop-color="#ffaa00"/>
+                                <stop id="coilGradStop2" offset="100%" stop-color="#ff8800"/>
                             </linearGradient>
                             <linearGradient id="shaftGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                                 <stop offset="0%" stop-color="#666"/>
@@ -137,6 +199,13 @@
                             </linearGradient>
                             <filter id="glow">
                                 <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                            <filter id="hazardGlow">
+                                <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
                                 <feMerge>
                                     <feMergeNode in="coloredBlur"/>
                                     <feMergeNode in="SourceGraphic"/>
@@ -197,7 +266,7 @@
                         </g>
 
                         <!-- B label -->
-                        <text x="300" y="130" text-anchor="middle" fill="#00c8ff" font-family="JetBrains Mono" font-size="14" opacity="0.8" filter="url(#glow)">
+                        <text x="300" y="130" text-anchor="middle" fill="#00c8ff" font-family="JetBrains Mono" font-size="14" opacity="0.85" filter="url(#glow)">
                             B &#8594;
                         </text>
 
@@ -237,14 +306,12 @@
                             <line id="conductorFront" x1="230" y1="185" x2="230" y2="325" stroke="#ffaa00" stroke-width="7" stroke-linecap="round"/>
 
                             <!-- Simbolos de fuerza: regla de la mano derecha (F = I x B) -->
-                            <!-- 'saliente' hacia el observador -->
                             <text id="forceSymbolFront" x="0" y="0" text-anchor="middle" font-family="JetBrains Mono" font-weight="bold" font-size="24" fill="#44ff88">&#x2299;</text>
                             <text id="forceLabelFront" x="0" y="0" text-anchor="middle" font-family="JetBrains Mono" font-weight="bold" font-size="11" fill="#44ff88">F</text>
-                            <!-- 'entrante' hacia la pagina -->
                             <text id="forceSymbolBack" x="0" y="0" text-anchor="middle" font-family="JetBrains Mono" font-weight="bold" font-size="18" fill="#44ff88" opacity="0.5">&#x2297;</text>
                             <text id="forceLabelBack" x="0" y="0" text-anchor="middle" font-family="JetBrains Mono" font-weight="bold" font-size="11" fill="#44ff88" opacity="0.5">F</text>
 
-                            <!-- Flechas de direccion de la corriente (el conmutador las invierte cada 180 grados) -->
+                            <!-- Flechas de direccion de la corriente -->
                             <text id="currentArrowFront" x="0" y="0" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#ffdd44" filter="url(#glow)">&#x25B2;</text>
                             <text id="currentArrowBack" x="0" y="0" text-anchor="middle" font-family="JetBrains Mono" font-size="13" fill="#ffdd44" filter="url(#glow)" opacity="0.6">&#x25BC;</text>
                         </g>
@@ -252,41 +319,56 @@
                         <!-- Center dot / axis indicator -->
                         <circle cx="300" cy="255" r="4" fill="#555" stroke="#777" stroke-width="1"/>
 
+                        <!-- Dynamic Smoke Particles Group (Generated during thermal overload) -->
+                        <g id="smokeGroup" opacity="0"></g>
+
                         <!-- Rotation axis -->
                         <line id="shaft" x1="300" y1="380" x2="300" y2="460" stroke="url(#shaftGrad)" stroke-width="6" stroke-linecap="round"/>
 
                         <!-- Commutator -->
                         <g id="commutatorGroup">
-                            <rect x="275" y="375" width="50" height="20" rx="3" fill="#886622" stroke="#aa8833" stroke-width="1"/>
+                            <rect id="commutatorRect" x="275" y="375" width="50" height="20" rx="3" fill="#886622" stroke="#aa8833" stroke-width="1"/>
                             <line id="splitLine" x1="300" y1="375" x2="300" y2="395" stroke="#444" stroke-width="2"/>
                             <text x="300" y="415" text-anchor="middle" fill="#aa8833" font-family="JetBrains Mono" font-size="9">Conmutador</text>
                         </g>
 
-                        <!-- Brushes -->
-                        <rect x="260" y="378" width="12" height="14" rx="2" fill="#555" stroke="#777" stroke-width="1"/>
-                        <rect x="328" y="378" width="12" height="14" rx="2" fill="#555" stroke="#777" stroke-width="1"/>
+                        <!-- Brushes (Escobillas de carbón) -->
+                        <rect id="brushLeft" x="260" y="378" width="12" height="14" rx="2" fill="#555" stroke="#777" stroke-width="1"/>
+                        <rect id="brushRight" x="328" y="378" width="12" height="14" rx="2" fill="#555" stroke="#777" stroke-width="1"/>
+
+                        <!-- Dynamic Electrical Arc & Spark Particles (Generated during arcing/overvoltage) -->
+                        <g id="sparksGroup" opacity="0"></g>
 
                         <!-- Shaft base -->
                         <rect x="280" y="455" width="40" height="15" rx="3" fill="#444" stroke="#555" stroke-width="1"/>
-                        <text x="300" y="485" text-anchor="middle" fill="#666" font-family="JetBrains Mono" font-size="9">Eje de rotacion</text>
+                        <text x="300" y="485" text-anchor="middle" fill="#666" font-family="JetBrains Mono" font-size="9">Eje de rotación</text>
 
                         <!-- Voltage source indicator -->
                         <g id="voltageSource">
-                            <rect x="20" y="440" width="80" height="35" rx="5" fill="rgba(0,200,255,0.1)" stroke="rgba(0,200,255,0.3)" stroke-width="1"/>
-                            <text x="60" y="455" text-anchor="middle" fill="#00c8ff" font-family="JetBrains Mono" font-size="9">Fuente</text>
-                            <text id="voltageLabelSVG" x="60" y="468" text-anchor="middle" fill="#00c8ff" font-family="JetBrains Mono" font-size="11" font-weight="bold">12V</text>
+                            <rect x="20" y="440" width="85" height="35" rx="5" fill="rgba(0,200,255,0.1)" stroke="rgba(0,200,255,0.3)" stroke-width="1"/>
+                            <text x="62" y="455" text-anchor="middle" fill="#00c8ff" font-family="JetBrains Mono" font-size="9">Fuente DC</text>
+                            <text id="voltageLabelSVG" x="62" y="468" text-anchor="middle" fill="#00c8ff" font-family="JetBrains Mono" font-size="11" font-weight="bold">12.0 V</text>
                             <!-- Wires -->
-                            <line x1="60" y1="440" x2="60" y2="400" stroke="#00c8ff" stroke-width="1.5" opacity="0.5"/>
-                            <line x1="60" y1="400" x2="266" y2="400" stroke="#00c8ff" stroke-width="1.5" opacity="0.5" stroke-dasharray="4,3"/>
-                            <line x1="540" y1="400" x2="540" y2="440" stroke="#00c8ff" stroke-width="1.5" opacity="0.5"/>
-                            <line x1="334" y1="400" x2="540" y2="400" stroke="#00c8ff" stroke-width="1.5" opacity="0.5" stroke-dasharray="4,3"/>
+                            <line x1="62" y1="440" x2="62" y2="400" stroke="#00c8ff" stroke-width="1.5" opacity="0.5"/>
+                            <line x1="62" y1="400" x2="266" y2="400" stroke="#00c8ff" stroke-width="1.5" opacity="0.5" stroke-dasharray="4,3"/>
+                            <line x1="538" y1="400" x2="538" y2="440" stroke="#00c8ff" stroke-width="1.5" opacity="0.5"/>
+                            <line x1="334" y1="400" x2="538" y2="400" stroke="#00c8ff" stroke-width="1.5" opacity="0.5" stroke-dasharray="4,3"/>
                         </g>
 
                         <!-- RPM Display -->
                         <g id="rpmDisplay">
-                            <rect x="460" y="430" width="100" height="40" rx="5" fill="rgba(0,200,255,0.08)" stroke="rgba(0,200,255,0.25)" stroke-width="1"/>
-                            <text x="510" y="447" text-anchor="middle" fill="#00c8ff" font-family="JetBrains Mono" font-size="9">RPM</text>
-                            <text id="rpmValueSVG" x="510" y="462" text-anchor="middle" fill="#00c8ff" font-family="Orbitron" font-size="14" font-weight="bold">0</text>
+                            <rect x="460" y="430" width="110" height="40" rx="5" fill="rgba(0,200,255,0.08)" stroke="rgba(0,200,255,0.25)" stroke-width="1"/>
+                            <text x="515" y="447" text-anchor="middle" fill="#00c8ff" font-family="JetBrains Mono" font-size="9">VELOCIDAD</text>
+                            <text id="rpmValueSVG" x="515" y="462" text-anchor="middle" fill="#00c8ff" font-family="Orbitron" font-size="14" font-weight="bold">0 RPM</text>
+                        </g>
+
+                        <!-- Hazard Warning Frame (Flashes during critical danger) -->
+                        <rect id="motorHazardBorder" x="3" y="3" width="594" height="494" rx="10" fill="none" stroke="#ff3344" stroke-width="3" opacity="0"/>
+
+                        <!-- Interactive In-SVG Warning Badge -->
+                        <g id="motorAlertHUD" opacity="0" style="cursor: pointer;" onclick="openHazardModal()">
+                            <rect x="180" y="16" width="240" height="34" rx="8" fill="rgba(255, 30, 60, 0.3)" stroke="#ff4466" stroke-width="1.5"/>
+                            <text x="300" y="38" text-anchor="middle" fill="#ff6688" font-family="Orbitron" font-size="11" font-weight="bold">⚠️ ¡SOBRECARGA DETECTADA!</text>
                         </g>
                     </svg>
                 </div>
@@ -295,7 +377,7 @@
                 <div class="motor-legend">
                     <div class="legend-item">
                         <span class="legend-color" style="background:#00c8ff"></span>
-                        <span>Campo Magnetico (B)</span>
+                        <span>Campo Magnético (B)</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-color" style="background:#ffaa00"></span>
@@ -307,82 +389,210 @@
                     </div>
                     <div class="legend-item">
                         <span class="legend-color" style="background:#ffdd44"></span>
-                        <span>Corriente (I) - el conmutador la invierte</span>
+                        <span>Corriente (I) - invertida por conmutador</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color" style="background:#ff3344"></span>
+                        <span>Zonas de Estrés / Chispas</span>
                     </div>
                 </div>
 
                 <p class="motor-note">
-                    Vista de perfil: la bobina gira sobre el eje vertical central (se observa
-                    "achatandose" en su proyeccion). Por la regla de la mano derecha (F = I &#215; B),
-                    la fuerza sobre cada conductor es perpendicular al plano de la vista:
-                    &#x2299; sale de la pantalla y &#x2297; entra a ella. El conmutador invierte la
-                    corriente cada media vuelta para que el torque no cambie de sentido.
+                    <strong>Vista de perfil:</strong> la bobina gira sobre el eje vertical central (se observa proyectada en 2D). Por la regla de la mano derecha (\(F = I \times B\)), la fuerza sobre cada conductor es perpendicular al plano: &#x2299; sale de la pantalla y &#x2297; entra en ella. El conmutador invierte el flujo cada 180° para que el torque mantenga siempre el mismo sentido.
                 </p>
             </div>
 
             <!-- Control Panel & Readings -->
             <div class="controls-panel">
+
+                <!-- Safety & Stress Diagnostic Monitor HUD -->
+                <div class="panel-section safety-monitor-section" id="safetyMonitorSection">
+                    <div class="safety-monitor-header">
+                        <div class="safety-title-wrap">
+                            <span class="safety-icon-indicator" id="safetyIconIndicator">🛡️</span>
+                            <div>
+                                <h3 class="panel-title mb-0">Sistema de Diagnóstico y Protección</h3>
+                                <span class="safety-status-sub" id="safetyStatusSub">Parámetros operativos dentro del rango seguro</span>
+                            </div>
+                        </div>
+                        <button class="btn-diag" id="btnDiag" onclick="openHazardModal()">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                            Ver Análisis
+                        </button>
+                    </div>
+
+                    <!-- Overall Stress Gauge Bar -->
+                    <div class="stress-bar-container">
+                        <div class="stress-bar-labels">
+                            <span class="stress-metric-name">Índice de Estrés Global:</span>
+                            <span id="stressPercentText" class="stress-percent-text">14% [Seguro]</span>
+                        </div>
+                        <div class="stress-bar-track">
+                            <div class="stress-bar-fill" id="stressBarFill" style="width: 14%;"></div>
+                            <div class="stress-marker" style="left: 60%;" title="Umbral de Alerta (60%)"></div>
+                            <div class="stress-marker danger" style="left: 85%;" title="Umbral Crítico (85%)"></div>
+                        </div>
+                        <div class="stress-bar-ticks">
+                            <span>0% Óptimo</span>
+                            <span>60% Precaución</span>
+                            <span>85%+ Peligro Crítico</span>
+                        </div>
+                    </div>
+
+                    <!-- Micro Metric Chips -->
+                    <div class="safety-micro-grid">
+                        <div class="safety-chip safe" id="chipVoltage">
+                            <div class="chip-top">
+                                <span class="chip-title">Tensión</span>
+                                <span class="chip-status" id="chipVoltageStatus">Seguro</span>
+                            </div>
+                            <span class="chip-val" id="chipVoltageVal">12.0 V</span>
+                            <span class="chip-limit">Límite: 18.0 V</span>
+                        </div>
+
+                        <div class="safety-chip safe" id="chipCurrent">
+                            <div class="chip-top">
+                                <span class="chip-title">Corriente</span>
+                                <span class="chip-status" id="chipCurrentStatus">Seguro</span>
+                            </div>
+                            <span class="chip-val" id="chipCurrentVal">2.40 A</span>
+                            <span class="chip-limit">Límite: 4.50 A</span>
+                        </div>
+
+                        <div class="safety-chip safe" id="chipHeat">
+                            <div class="chip-top">
+                                <span class="chip-title">Pérdida Joule (I²R)</span>
+                                <span class="chip-status" id="chipHeatStatus">Seguro</span>
+                            </div>
+                            <span class="chip-val" id="chipHeatVal">28.8 W</span>
+                            <span class="chip-limit">Límite: 50.0 W</span>
+                        </div>
+
+                        <div class="safety-chip safe" id="chipSpeed">
+                            <div class="chip-top">
+                                <span class="chip-title">Velocidad</span>
+                                <span class="chip-status" id="chipSpeedStatus">Seguro</span>
+                            </div>
+                            <span class="chip-val" id="chipSpeedVal">1400 RPM</span>
+                            <span class="chip-limit">Límite: 3200 RPM</span>
+                        </div>
+                    </div>
+
+                    <!-- Breaker / Fuse Trip Emergency Overlay (Shown when breaker trips) -->
+                    <div class="breaker-trip-banner" id="breakerTripBanner" style="display:none;">
+                        <div class="trip-left">
+                            <div class="trip-icon">⚡💥</div>
+                            <div>
+                                <h4 class="trip-title">¡DISYUNTOR TÉRMICO DISPARADO!</h4>
+                                <p class="trip-desc">Corte automático de alimentación activado tras operar en sobrecarga extrema para salvar el bobinado de combustión inminente.</p>
+                            </div>
+                        </div>
+                        <button class="btn btn-trip-reset" onclick="rearmBreaker()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+                            </svg>
+                            Rearmar Disyuntor
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Control Sliders -->
                 <div class="panel-section">
-                    <h3 class="panel-title">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2">
-                            <circle cx="12" cy="12" r="3"/><path d="M12 1v4m0 14v4m-7.07-3.93l2.83-2.83m8.48-8.48l2.83-2.83M1 12h4m14 0h4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83"/>
-                        </svg>
-                        Panel de Control
-                    </h3>
+                    <div class="panel-section-header">
+                        <h3 class="panel-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2">
+                                <circle cx="12" cy="12" r="3"/><path d="M12 1v4m0 14v4m-7.07-3.93l2.83-2.83m8.48-8.48l2.83-2.83M1 12h4m14 0h4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83"/>
+                            </svg>
+                            Parámetros del Sistema
+                        </h3>
+                        <span class="panel-hint">Ajusta los deslizadores para simular</span>
+                    </div>
 
                     <div class="control-group">
-                        <label class="control-label">
-                            <span>Voltaje (V)</span>
+                        <label class="control-label" for="voltageSlider">
+                            <span class="label-with-icon">
+                                <span class="label-name">Voltaje de Alimentación (V)</span>
+                                <span class="label-tag">Ley de Ohm</span>
+                            </span>
                             <span class="control-value" id="voltageValue">12.0 V</span>
                         </label>
-                        <input type="range" id="voltageSlider" class="slider slider-cyan" min="0" max="24" step="0.5" value="12">
-                        <div class="slider-range"><span>0V</span><span>24V</span></div>
+                        <input type="range" id="voltageSlider" class="slider slider-cyan" min="0" max="30" step="0.5" value="12">
+                        <div class="slider-range">
+                            <span>0V</span>
+                            <span class="range-zone safe">12V Nominal</span>
+                            <span class="range-zone warn">18V Máx Seguro</span>
+                            <span class="range-zone danger">30V Sobretensión</span>
+                        </div>
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label">
-                            <span>Resistencia (R)</span>
+                        <label class="control-label" for="resistanceSlider">
+                            <span class="label-with-icon">
+                                <span class="label-name">Resistencia del Bobinado (R)</span>
+                                <span class="label-tag">Disipación Térmica</span>
+                            </span>
                             <span class="control-value" id="resistanceValue">5.0 &#8486;</span>
                         </label>
-                        <input type="range" id="resistanceSlider" class="slider slider-purple" min="1" max="50" step="0.5" value="5">
-                        <div class="slider-range"><span>1&#8486;</span><span>50&#8486;</span></div>
+                        <input type="range" id="resistanceSlider" class="slider slider-purple" min="0.5" max="50" step="0.5" value="5">
+                        <div class="slider-range">
+                            <span class="range-zone danger">0.5&#8486; (Corto)</span>
+                            <span class="range-zone safe">5.0&#8486; Nominal</span>
+                            <span>50&#8486;</span>
+                        </div>
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label">
-                            <span>Campo Magnetico (B)</span>
+                        <label class="control-label" for="bFieldSlider">
+                            <span class="label-with-icon">
+                                <span class="label-name">Campo Magnético (B)</span>
+                                <span class="label-tag">Imanes Estator</span>
+                            </span>
                             <span class="control-value" id="bFieldValue">0.50 T</span>
                         </label>
                         <input type="range" id="bFieldSlider" class="slider slider-blue" min="0.05" max="2" step="0.05" value="0.5">
-                        <div class="slider-range"><span>0.05T</span><span>2.0T</span></div>
+                        <div class="slider-range">
+                            <span class="range-zone warn">0.05T (Débil/Sobregiro)</span>
+                            <span class="range-zone safe">0.50T</span>
+                            <span>2.0T</span>
+                        </div>
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label">
-                            <span>Longitud del Conductor (L)</span>
+                        <label class="control-label" for="lengthSlider">
+                            <span class="label-with-icon">
+                                <span class="label-name">Longitud del Conductor Activo (L)</span>
+                                <span class="label-tag">Fuerza Lorentz</span>
+                            </span>
                             <span class="control-value" id="lengthValue">0.20 m</span>
                         </label>
                         <input type="range" id="lengthSlider" class="slider slider-green" min="0.05" max="0.5" step="0.01" value="0.20">
-                        <div class="slider-range"><span>0.05m</span><span>0.50m</span></div>
+                        <div class="slider-range"><span>0.05m</span><span>0.20m</span><span>0.50m</span></div>
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label">
-                            <span>Vueltas de la Bobina (N)</span>
+                        <label class="control-label" for="turnsSlider">
+                            <span class="label-with-icon">
+                                <span class="label-name">Vueltas de la Bobina (N)</span>
+                                <span class="label-tag">Multiplicador</span>
+                            </span>
                             <span class="control-value" id="turnsValue">100</span>
                         </label>
                         <input type="range" id="turnsSlider" class="slider slider-orange" min="10" max="500" step="10" value="100">
-                        <div class="slider-range"><span>10</span><span>500</span></div>
+                        <div class="slider-range"><span>10</span><span>100</span><span>500</span></div>
                     </div>
 
                     <div class="control-group">
-                        <label class="control-label">
-                            <span>Radio del Eje (r)</span>
+                        <label class="control-label" for="radiusSlider">
+                            <span class="label-with-icon">
+                                <span class="label-name">Radio del Rotor / Brazo (r)</span>
+                                <span class="label-tag">Brazo de Torque</span>
+                            </span>
                             <span class="control-value" id="radiusValue">0.05 m</span>
                         </label>
                         <input type="range" id="radiusSlider" class="slider slider-red" min="0.01" max="0.15" step="0.005" value="0.05">
-                        <div class="slider-range"><span>0.01m</span><span>0.15m</span></div>
+                        <div class="slider-range"><span>0.01m</span><span>0.05m</span><span>0.15m</span></div>
                     </div>
                 </div>
 
@@ -392,109 +602,109 @@
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#44ff88" stroke-width="2">
                             <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
                         </svg>
-                        Lecturas en Tiempo Real
+                        Lecturas Dinámicas en Tiempo Real
                     </h3>
 
                     <div class="readings-grid">
-                        <div class="reading-card">
+                        <div class="reading-card" id="cardCurrent">
                             <div class="reading-icon" style="color:#ffdd44">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
                                 </svg>
                             </div>
                             <div class="reading-info">
-                                <span class="reading-label">Corriente (I)</span>
+                                <span class="reading-label">Corriente Neta (I)</span>
                                 <span class="reading-value" id="currentReading">0.00 A</span>
                             </div>
                         </div>
 
-                        <div class="reading-card">
+                        <div class="reading-card" id="cardForce">
                             <div class="reading-icon" style="color:#44ff88">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M5 12h14M12 5l7 7-7 7"/>
                                 </svg>
                             </div>
                             <div class="reading-info">
-                                <span class="reading-label">Fuerza (F)</span>
+                                <span class="reading-label">Fuerza Lorentz (F)</span>
                                 <span class="reading-value" id="forceReading">0.00 N</span>
                             </div>
                         </div>
 
-                        <div class="reading-card">
+                        <div class="reading-card" id="cardTorque">
                             <div class="reading-icon" style="color:#00c8ff">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>
                                 </svg>
                             </div>
                             <div class="reading-info">
-                                <span class="reading-label">Torque (&#964;)</span>
+                                <span class="reading-label">Torque (\(\tau\))</span>
                                 <span class="reading-value" id="torqueReading">0.000 N·m</span>
                             </div>
                         </div>
 
-                        <div class="reading-card">
+                        <div class="reading-card" id="cardOmega">
                             <div class="reading-icon" style="color:#ff8866">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 2v20M2 12h20"/>
                                 </svg>
                             </div>
                             <div class="reading-info">
-                                <span class="reading-label">Vel. Angular (&#969;)</span>
+                                <span class="reading-label">Vel. Angular (\(\omega\))</span>
                                 <span class="reading-value" id="omegaReading">0.00 rad/s</span>
                             </div>
                         </div>
 
-                        <div class="reading-card">
+                        <div class="reading-card" id="cardRpm">
                             <div class="reading-icon" style="color:#7850ff">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 2v10l7-7"/>
                                 </svg>
                             </div>
                             <div class="reading-info">
-                                <span class="reading-label">RPM</span>
+                                <span class="reading-label">Régimen (RPM)</span>
                                 <span class="reading-value" id="rpmReading">0 rpm</span>
                             </div>
                         </div>
 
-                        <div class="reading-card">
+                        <div class="reading-card" id="cardPower">
                             <div class="reading-icon" style="color:#ff4488">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
                                 </svg>
                             </div>
                             <div class="reading-info">
-                                <span class="reading-label">Potencia (P)</span>
+                                <span class="reading-label">Potencia Eléctrica (P)</span>
                                 <span class="reading-value" id="powerReading">0.00 W</span>
                             </div>
                         </div>
 
-                        <div class="reading-card">
+                        <div class="reading-card" id="cardBackEmf">
                             <div class="reading-icon" style="color:#00aacc">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>
                                 </svg>
                             </div>
                             <div class="reading-info">
-                                <span class="reading-label">Back-EMF</span>
+                                <span class="reading-label">Contrafem (Back-EMF)</span>
                                 <span class="reading-value" id="backEmfReading">0.00 V</span>
                             </div>
                         </div>
 
-                        <div class="reading-card">
+                        <div class="reading-card" id="cardEfficiency">
                             <div class="reading-icon" style="color:#ffcc00">
                                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
                                 </svg>
                             </div>
                             <div class="reading-info">
-                                <span class="reading-label">Efficiencia (&#951;)</span>
-                                <span class="reading-value" id="efficiencyReading">0 %</span>
+                                <span class="reading-label">Eficiencia (\(\eta\))</span>
+                                <span class="reading-value" id="efficiencyReading">0.0 %</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Play/Stop Button -->
+                <!-- Simulation Control Buttons -->
                 <div class="control-buttons">
                     <button id="playBtn" class="btn btn-play" onclick="toggleSimulation()">
                         <svg id="playIcon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -503,29 +713,104 @@
                         <svg id="stopIcon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="display:none">
                             <rect x="4" y="4" width="16" height="16" rx="2"/>
                         </svg>
-                        <span id="playBtnText">Iniciar Simulacion</span>
+                        <span id="playBtnText">Iniciar Simulación</span>
                     </button>
-                    <button class="btn btn-reset" onclick="resetSimulation()">
+                    <button class="btn btn-reset" onclick="resetSimulation()" title="Restablecer sliders a valores por defecto">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M1 4v6h6M23 20v-6h-6"/>
                             <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/>
                         </svg>
                         Reiniciar
                     </button>
+                    <button class="btn btn-safety-action" onclick="restoreSafeParameters()" title="Calibrar todo a operación 100% segura">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                        Ajuste Seguro
+                    </button>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- Hazard Warning & Diagnostics Modal (Popup interactivo de advertencia) -->
+    <div id="hazardModal" class="hazard-modal-backdrop" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="hazardModalTitle">
+        <div class="hazard-modal-card">
+            <div class="hazard-modal-header" id="hazardModalHeader">
+                <div class="hazard-header-left">
+                    <div class="hazard-icon-pulse" id="hazardModalIcon">⚠️</div>
+                    <div>
+                        <span class="hazard-badge-level" id="hazardModalBadge">ALERTA CRÍTICA DE SOBRECARGA</span>
+                        <h2 id="hazardModalTitle" class="hazard-title">Límites Operativos de Seguridad Excedidos</h2>
+                    </div>
+                </div>
+                <button class="hazard-close-btn" onclick="closeHazardModal()" aria-label="Cerrar modal de aviso">&times;</button>
+            </div>
+
+            <div class="hazard-modal-body">
+                <!-- Section 1: Diagnóstico exacto del problema -->
+                <div class="hazard-detail-box problem-box">
+                    <div class="detail-box-header">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                        </svg>
+                        <h4>¿Cuál es el problema detectado en el circuito?</h4>
+                    </div>
+                    <ul id="hazardProblemList" class="hazard-list problem-list">
+                        <!-- Generado dinámicamente -->
+                    </ul>
+                </div>
+
+                <!-- Section 2: Consecuencias Físicas y Reales -->
+                <div class="hazard-detail-box consequences-box">
+                    <div class="detail-box-header danger">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ff4466" stroke-width="2">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                        <h4>¿Qué podría pasar físicamente si no se detiene? (Consecuencias Reales)</h4>
+                    </div>
+                    <ul id="hazardConsequenceList" class="hazard-list consequence-list">
+                        <!-- Generado dinámicamente -->
+                    </ul>
+                </div>
+
+                <!-- Section 3: Recomendación técnica y protección -->
+                <div class="hazard-detail-box solution-box">
+                    <div class="detail-box-header success">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#44ff88" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>
+                        </svg>
+                        <h4>Medida Preventiva y Protección del Motor</h4>
+                    </div>
+                    <p id="hazardSolutionText" class="hazard-solution-p">
+                        El simulador cuenta con un disyuntor térmico de seguridad que desconectará la alimentación si el motor permanece en peligro extremo por más de 5 segundos. Recomendamos restablecer la tensión a 12V y mantener la resistencia por encima de 4.0 &#8486;.
+                    </p>
+                </div>
+            </div>
+
+            <div class="hazard-modal-footer">
+                <button class="btn btn-safe-restore" onclick="restoreSafeParameters()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>
+                    </svg>
+                    🛡️ Calibrar a Parámetros Seguros (12V)
+                </button>
+                <button class="btn btn-hazard-dismiss" onclick="dismissHazardModal(true)">
+                    ⚠️ Continuar bajo mi propio riesgo (Modo Experimental)
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Variables Effect Section -->
     <section id="variables" class="variables-section">
         <div class="variables-container">
-            <h2 class="section-title variables-title">Efecto de cada Variable</h2>
+            <h2 class="section-title variables-title">Efecto de cada Variable Física</h2>
             <p class="variables-intro">
-                Cada control del panel modifica una variable del motor. A continuacion se explica
-                que ocurre en las ecuaciones y que deberias observar en la animacion cuando aumentas
-                cada una de ellas. Prueba a mover los deslizadores mientras el motor esta en marcha
-                y comprueba los cambios en las lecturas.
+                Cada control del panel modifica una variable del sistema electromecánico. A continuación se explica
+                qué ocurre en las leyes físicas, cómo influye en los límites de seguridad térmica y qué se observa en la animación
+                vectorial. Modifica los parámetros con el motor encendido para verificar la respuesta dinámica.
             </p>
 
             <div class="variables-grid">
@@ -536,25 +821,21 @@
                         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="2">
                             <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
                         </svg>
-                        <h3>Voltaje (V)</h3>
-                        <span class="badge badge-up">Sube todo</span>
+                        <h3>Voltaje Aplicado (V)</h3>
+                        <span class="badge badge-up">Acelera / Calienta</span>
                     </div>
                     <div class="variable-formula">I = (V &minus; E<sub>back</sub>) / R</div>
                     <p>
-                        Aumenta la corriente que circula por la bobina (Ley de Ohm), lo que eleva la
-                        fuerza magnetica, el torque y la velocidad maxima de giro.
+                        Aumenta la fuerza electromotriz que impulsa electrones por el bobinado. Eleva la corriente inicial, el torque de arranque y la velocidad angular máxima de giro.
                     </p>
                     <ul class="variable-effects">
                         <li><span class="arrow-up">&#9650;</span> Corriente I</li>
                         <li><span class="arrow-up">&#9650;</span> Fuerza F</li>
-                        <li><span class="arrow-up">&#9650;</span> Torque &#964;</li>
-                        <li><span class="arrow-up">&#9650;</span> RPM (velocidad de giro)</li>
+                        <li><span class="arrow-up">&#9650;</span> Torque \(\tau\)</li>
+                        <li><span class="arrow-up">&#9650;</span> Velocidad RPM</li>
                     </ul>
                     <div class="variable-observa">
-                        <strong>En la animacion:</strong> la bobina brilla mas (mas corriente), la flecha
-                        de corriente se ve mas intensa, los simbolos de fuerza
-                        <span class="sym-front">&#x2299;</span>/<span class="sym-back">&#x2297;</span>
-                        crecen y el giro se acelera.
+                        <strong>En la animación y seguridad:</strong> la bobina brilla con mayor intensidad. Al superar <strong>18V - 22V</strong>, se dispara la alerta de sobretensión: surgen chispas y arco eléctrico en las escobillas del conmutador.
                     </div>
                 </div>
 
@@ -564,25 +845,21 @@
                         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#7850ff" stroke-width="2">
                             <path d="M4 12h3l2-5 3 10 3-10 2 5h3"/>
                         </svg>
-                        <h3>Resistencia (R)</h3>
-                        <span class="badge badge-down">Frena el motor</span>
+                        <h3>Resistencia del Bobinado (R)</h3>
+                        <span class="badge badge-down">Limita Corriente</span>
                     </div>
-                    <div class="variable-formula">I = (V &minus; E<sub>back</sub>) / R</div>
+                    <div class="variable-formula">P<sub>pérdida</sub> = I<sup>2</sup> &middot; R</div>
                     <p>
-                        Al aumentar la resistencia del bobinado, la corriente disminuye. Menos corriente
-                        significa menos fuerza y menos torque, por lo que el motor gira mas lento e
-                        incluso puede detenerse si la resistencia es muy alta.
+                        Determina la oposición al paso de corriente. Si la resistencia es alta, frena el motor por escasez de corriente. Si es excesivamente baja (&lt; 2 &#8486;), la corriente se dispara a niveles de cortocircuito.
                     </p>
                     <ul class="variable-effects">
-                        <li><span class="arrow-down">&#9660;</span> Corriente I</li>
-                        <li><span class="arrow-down">&#9660;</span> Fuerza F</li>
-                        <li><span class="arrow-down">&#9660;</span> Torque &#964;</li>
-                        <li><span class="arrow-down">&#9660;</span> RPM (velocidad de giro)</li>
+                        <li><span class="arrow-down">&#9660;</span> Corriente I (al subir R)</li>
+                        <li><span class="arrow-down">&#9660;</span> Torque \(\tau\)</li>
+                        <li><span class="arrow-down">&#9660;</span> RPM</li>
+                        <li><span class="arrow-up danger">&#9650;</span> Riesgo de Fuego (si R es baja)</li>
                     </ul>
                     <div class="variable-observa">
-                        <strong>En la animacion:</strong> la bobina se oscurece (menos corriente), los
-                        simbolos de fuerza se encogen y el giro se vuelve lento. Con una R muy alta, el
-                        motor se detiene por completo.
+                        <strong>En la animación y seguridad:</strong> si bajas R a menos de <strong>1.5 &#8486;</strong> con voltaje alto, se genera sobrecalentamiento instantáneo, emitiendo humo y activando el disparo del disyuntor térmico.
                     </div>
                 </div>
 
@@ -592,25 +869,20 @@
                         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#00aacc" stroke-width="2">
                             <path d="M3 12h18M7 8v8M11 5v14M15 8v8M19 6v12"/>
                         </svg>
-                        <h3>Campo Magnetico (B)</h3>
-                        <span class="badge badge-mix">Mas fuerza, menos RPM</span>
+                        <h3>Campo Magnético (B)</h3>
+                        <span class="badge badge-mix">Par vs Velocidad</span>
                     </div>
                     <div class="variable-formula">F = 2&middot;N&middot;B&middot;I&middot;L  &nbsp;&bull;&nbsp;  E<sub>back</sub> &#8733; B</div>
                     <p>
-                        Al aumentar B, cada conductor experimenta mas fuerza de Lorentz y el motor
-                        arranca con mas torque. Sin embargo, tambien crece la fem inducida
-                        (back-EMF) que se opone al voltaje, por lo que la corriente neta a alta
-                        velocidad disminuye y el regimen de RPM maximas baja.
+                        A mayor inducción magnética, mayor es la fuerza de Lorentz y el torque de arranque. Sin embargo, también crece la contrafem (Back-EMF), reduciendo la corriente neta en régimen permanente.
                     </p>
                     <ul class="variable-effects">
-                        <li><span class="arrow-up">&#9650;</span> Fuerza F y torque de arranque</li>
-                        <li><span class="arrow-up">&#9650;</span> Back-EMF (oposicion)</li>
-                        <li><span class="arrow-down">&#9660;</span> RPM maximas</li>
+                        <li><span class="arrow-up">&#9650;</span> Fuerza F y Torque de arranque</li>
+                        <li><span class="arrow-up">&#9650;</span> Back-EMF protectora</li>
+                        <li><span class="arrow-down">&#9660;</span> Velocidad final RPM</li>
                     </ul>
                     <div class="variable-observa">
-                        <strong>En la animacion:</strong> las lineas de campo se vuelven mas brillantes,
-                        mas densas y fluyen mas rapido; los simbolos de fuerza se agrandan; el arranque
-                        es mas potente pero la velocidad final es menor.
+                        <strong>En la animación:</strong> las líneas de campo azul cian se intensifican y fluyen más rápido. Con campo muy débil (&lt; 0.1T), la contrafem desaparece y el motor puede embalarse (sobrevelocidad mecánica).
                     </div>
                 </div>
 
@@ -622,22 +894,19 @@
                             <line x1="4" y1="20" x2="20" y2="20"/>
                         </svg>
                         <h3>Longitud del Conductor (L)</h3>
-                        <span class="badge badge-up">Mas fuerza</span>
+                        <span class="badge badge-up">Más Fuerza</span>
                     </div>
                     <div class="variable-formula">F = 2&middot;N&middot;B&middot;I&middot;L</div>
                     <p>
-                        Cuanto mayor es la longitud del conductor que atraviesa el campo magnetico,
-                        mayor es la fuerza de Lorentz para la misma corriente. El torque sube, pero la
-                        velocidad maxima no cambia porque L no influye en el back-EMF.
+                        Es la longitud del tramo de alambre inmerso dentro del flujo magnético. Al duplicar L, se duplica la interacción magnética sin alterar el voltaje de entrada.
                     </p>
                     <ul class="variable-effects">
-                        <li><span class="arrow-up">&#9650;</span> Fuerza F</li>
-                        <li><span class="arrow-up">&#9650;</span> Torque &#964;</li>
-                        <li><span class="neutral">&#9650;&#9660;</span> RPM sin cambios</li>
+                        <li><span class="arrow-up">&#9650;</span> Fuerza magnetomecánica F</li>
+                        <li><span class="arrow-up">&#9650;</span> Torque en el rotor</li>
+                        <li><span class="neutral">&#9650;&#9660;</span> RPM límite sin cambios</li>
                     </ul>
                     <div class="variable-observa">
-                        <strong>En la animacion:</strong> los conductores aprovechan mejor el campo: los
-                        simbolos de fuerza crecen, se consigue el mismo giro con menos corriente.
+                        <strong>En la animación:</strong> los símbolos de fuerza crecen en pantalla y el motor entrega mayor potencia mecánica útil para la misma corriente.
                     </div>
                 </div>
 
@@ -648,22 +917,19 @@
                             <path d="M12 4a8 8 0 1 0 8 8"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2"/>
                         </svg>
                         <h3>Vueltas de la Bobina (N)</h3>
-                        <span class="badge badge-up">Mas fuerza</span>
+                        <span class="badge badge-up">Multiplicador de Par</span>
                     </div>
                     <div class="variable-formula">F = 2&middot;N&middot;B&middot;I&middot;L</div>
                     <p>
-                        Cada espira adicional aporta fuerza a la misma corriente: es como si el
-                        conductor pasara N veces por el campo. La fuerza y el torque crecen
-                        proporcionalmente a N. La velocidad maxima del modelo no se ve afectada.
+                        Cada espira adicional suma su propia fuerza de Lorentz de forma constructiva. Equivale a hacer pasar la corriente N veces a través del entrehierro magnético.
                     </p>
                     <ul class="variable-effects">
-                        <li><span class="arrow-up">&#9650;</span> Fuerza F</li>
-                        <li><span class="arrow-up">&#9650;</span> Torque &#964;</li>
-                        <li><span class="neutral">&#9650;&#9660;</span> RPM sin cambios</li>
+                        <li><span class="arrow-up">&#9650;</span> Fuerza neta F</li>
+                        <li><span class="arrow-up">&#9650;</span> Torque disponible \(\tau\)</li>
+                        <li><span class="neutral">&#9650;&#9660;</span> Régimen base</li>
                     </ul>
                     <div class="variable-observa">
-                        <strong>En la animacion:</strong> la bobina se dibuja mas robusta y luminosa con
-                        mas vueltas, y el par de giro se siente mas potente.
+                        <strong>En la animación:</strong> los conductores de la bobina se dibujan con mayor grosor visual y luminosidad conforme N aumenta hacia 500 vueltas.
                     </div>
                 </div>
 
@@ -673,22 +939,19 @@
                         <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#ff4466" stroke-width="2">
                             <circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/>
                         </svg>
-                        <h3>Radio del Eje (r)</h3>
-                        <span class="badge badge-up">Mas torque</span>
+                        <h3>Radio del Rotor / Brazo (r)</h3>
+                        <span class="badge badge-up">Brazo de Palanca</span>
                     </div>
-                    <div class="variable-formula">&#964; = F &middot; r</div>
+                    <div class="variable-formula">\(\tau\) = F &middot; r</div>
                     <p>
-                        El radio funciona como el brazo de palanca del torque: a mayor radio, la misma
-                        fuerza produce un mayor giro. El motor gana torque real en el eje, lo que
-                        permite mover cargas mas pesadas.
+                        El radio actúa como el brazo de momento de torsión: a mayor distancia entre el conductor y el eje central, la misma fuerza F produce un torque rotacional superior.
                     </p>
                     <ul class="variable-effects">
-                        <li><span class="arrow-up">&#9650;</span> Torque &#964;</li>
-                        <li><span class="neutral">&#9650;&#9660;</span> RPM sin cambios</li>
+                        <li><span class="arrow-up">&#9650;</span> Torque motriz \(\tau\)</li>
+                        <li><span class="neutral">&#9650;&#9660;</span> RPM teóricas sin carga</li>
                     </ul>
                     <div class="variable-observa">
-                        <strong>En la animacion:</strong> la bobina describe una circunferencia mas
-                        amplia (el rotor se ve mas grande) y el giro transmite mas fuerza al eje.
+                        <strong>En la animación:</strong> la bobina aumenta de ancho y altura, trazando una trayectoria orbital más amplia en el rotor proyectado.
                     </div>
                 </div>
 
@@ -699,13 +962,13 @@
     <!-- Theory Section -->
     <section id="teoria" class="theory-section">
         <div class="theory-container">
-            <h2 class="section-title theory-title">Marco Teorico</h2>
+            <h2 class="section-title theory-title">Marco Teórico y Fundamentos Físicos</h2>
 
             <div class="theory-grid">
                 <!-- Card 1: Lorentz Force -->
                 <div class="theory-card">
                     <div class="card-header">
-                        <svg class="card-icon" viewBox="0 0 50 50" width="50" height="50">
+                        <svg class="card-icon" viewBox="0 0 50 50" width="46" height="46">
                             <circle cx="25" cy="25" r="23" fill="none" stroke="#00c8ff" stroke-width="1.5" opacity="0.4"/>
                             <path d="M15 25 L25 15 L35 25 L25 35 Z" fill="none" stroke="#00c8ff" stroke-width="1.5"/>
                             <circle cx="25" cy="25" r="3" fill="#00c8ff"/>
@@ -713,124 +976,144 @@
                         <h3>Fuerza de Lorentz</h3>
                     </div>
                     <div class="formula-box">
-                        <span class="formula">F = N · B · I · L</span>
+                        <span class="formula">F = N &middot; B &middot; I &middot; L</span>
                     </div>
-                    <p>La fuerza magnetica que actua sobre un conductor por el que circula una corriente electrica dentro de un campo magnetico. Esta fuerza es la responsable del movimiento de la bobina y, por tanto, de la rotacion del motor.</p>
+                    <p>Fuerza magnética vectorial que actúa sobre conductores inmersos en un campo magnético uniforme. Produce el par motriz de giro continuo mediante la interacción del campo del estator con el campo del inducido.</p>
                     <ul class="formula-desc">
-                        <li><strong>F</strong> = Fuerza magnetica (N)</li>
-                        <li><strong>N</strong> = Numero de vueltas de la bobina</li>
-                        <li><strong>B</strong> = Campo magnetico (T)</li>
-                        <li><strong>I</strong> = Corriente electrica (A)</li>
-                        <li><strong>L</strong> = Longitud del conductor (m)</li>
+                        <li><strong>F</strong> = Fuerza magnética resultante (N)</li>
+                        <li><strong>N</strong> = Número de espiras activas</li>
+                        <li><strong>B</strong> = Inducción de campo magnético (T)</li>
+                        <li><strong>I</strong> = Corriente eléctrica neta (A)</li>
+                        <li><strong>L</strong> = Longitud efectiva del conductor (m)</li>
                     </ul>
                     <p class="formula-note">
-                        Con la regla de la mano derecha (F = I &#215; B) la fuerza sobre cada conductor
-                        es perpendicular al plano: sale de la pantalla (&#x2299;) del lado que esta al
-                        frente y entra a la pagina (&#x2297;) del lado opuesto, siempre opuestas entre si
-                        para generar el giro. Observa estos simbolos en la animacion.
+                        Por la regla de la mano derecha (\(\vec{F} = I\vec{L} \times \vec{B}\)), un lado experimenta fuerza hacia el observador (&#x2299;) y el lado opuesto hacia el fondo (&#x2297;), garantizando rotación en par de fuerzas.
                     </p>
                 </div>
 
                 <!-- Card 2: Ohm's Law -->
                 <div class="theory-card">
                     <div class="card-header">
-                        <svg class="card-icon" viewBox="0 0 50 50" width="50" height="50">
+                        <svg class="card-icon" viewBox="0 0 50 50" width="46" height="46">
                             <circle cx="25" cy="25" r="23" fill="none" stroke="#7850ff" stroke-width="1.5" opacity="0.4"/>
                             <path d="M15 25 Q20 15 25 25 Q30 35 35 25" fill="none" stroke="#7850ff" stroke-width="2"/>
                         </svg>
-                        <h3>Ley de Ohm</h3>
+                        <h3>Ley de Ohm y Circuito de Armadura</h3>
                     </div>
                     <div class="formula-box">
-                        <span class="formula">I = V / R</span>
+                        <span class="formula">I = (V &minus; E<sub>back</sub>) / R</span>
                     </div>
-                    <p>La corriente electrica que circula por el circuito del motor depende del voltaje aplicado y la resistencia del bobinado. Un mayor voltaje produce mayor corriente, incrementando la fuerza sobre la bobina.</p>
+                    <p>La corriente circulante está regulada por la diferencia entre la tensión de la fuente y la fuerza contraelectromotriz generada internamente, dividida por la resistencia del bobinado.</p>
                     <ul class="formula-desc">
-                        <li><strong>I</strong> = Corriente electrica (A)</li>
-                        <li><strong>V</strong> = Voltaje aplicado (V)</li>
-                        <li><strong>R</strong> = Resistencia del bobinado (&#8486;)</li>
+                        <li><strong>I</strong> = Intensidad de corriente (A)</li>
+                        <li><strong>V</strong> = Tensión aplicada de alimentación (V)</li>
+                        <li><strong>E<sub>back</sub></strong> = Contrafem inducida (V)</li>
+                        <li><strong>R</strong> = Resistencia óhmica del alambre (&#8486;)</li>
                     </ul>
                 </div>
 
                 <!-- Card 3: Torque -->
                 <div class="theory-card">
                     <div class="card-header">
-                        <svg class="card-icon" viewBox="0 0 50 50" width="50" height="50">
+                        <svg class="card-icon" viewBox="0 0 50 50" width="46" height="46">
                             <circle cx="25" cy="25" r="23" fill="none" stroke="#44ff88" stroke-width="1.5" opacity="0.4"/>
                             <circle cx="25" cy="25" r="8" fill="none" stroke="#44ff88" stroke-width="1.5"/>
                             <path d="M25 17 L25 10 M33 25 L40 25 M25 33 L25 40 M17 25 L10 25" stroke="#44ff88" stroke-width="1.5"/>
                         </svg>
-                        <h3>Torque Motor</h3>
+                        <h3>Torque Mecánico</h3>
                     </div>
                     <div class="formula-box">
-                        <span class="formula">&#964; = F · r</span>
+                        <span class="formula">\(\tau\) = F &middot; r = N &middot; B &middot; I &middot; L &middot; r</span>
                     </div>
-                    <p>El torque o momento de fuerza es el giro que experimenta la bobina alrededor del eje. Se genera por la accion de la fuerza de Lorentz a una distancia r del eje de rotacion.</p>
+                    <p>El momento de torsión o par motor es la capacidad mecánica de rotación transmitida al eje de salida. Determina cuánta carga mecánica o rozamiento puede vencer el motor.</p>
                     <ul class="formula-desc">
-                        <li><strong>&#964;</strong> = Torque (N·m)</li>
-                        <li><strong>F</strong> = Fuerza magnetica (N)</li>
-                        <li><strong>r</strong> = Radio del eje (m)</li>
+                        <li><strong>\(\tau\)</strong> = Torque o par motor (N·m)</li>
+                        <li><strong>F</strong> = Fuerza tangencial total (N)</li>
+                        <li><strong>r</strong> = Radio de giro del inducido (m)</li>
                     </ul>
                 </div>
 
                 <!-- Card 4: Back-EMF -->
                 <div class="theory-card">
                     <div class="card-header">
-                        <svg class="card-icon" viewBox="0 0 50 50" width="50" height="50">
+                        <svg class="card-icon" viewBox="0 0 50 50" width="46" height="46">
                             <circle cx="25" cy="25" r="23" fill="none" stroke="#ff8866" stroke-width="1.5" opacity="0.4"/>
                             <path d="M15 35 L25 15 L35 35" fill="none" stroke="#ff8866" stroke-width="2"/>
                             <line x1="20" y1="28" x2="30" y2="28" stroke="#ff8866" stroke-width="1.5"/>
                         </svg>
-                        <h3>Back-EMF</h3>
+                        <h3>Contrafem (Back-EMF - Ley de Faraday)</h3>
                     </div>
                     <div class="formula-box">
-                        <span class="formula">V<sub>back</sub> = k · &#969;</span>
+                        <span class="formula">E<sub>back</sub> = k<sub>e</sub> &middot; \(\omega\) &middot; B</span>
                     </div>
-                    <p>Cuando la bobina gira dentro del campo magnetico, se genera una fuerza electromotriz (FEM) inducida que se opone al voltaje aplicado. A mayor velocidad angular, mayor es esta contravoltaje.</p>
+                    <p>Al girar la bobina en el campo magnético, se induce un voltaje opuesto según la Ley de Lenz. Actúa como un regulador natural de velocidad que previene corrientes destructivas a altas RPM.</p>
                     <ul class="formula-desc">
-                        <li><strong>V<sub>back</sub></strong> = FEM inducida (V)</li>
-                        <li><strong>k</strong> = Constante del motor (V·s/rad)</li>
-                        <li><strong>&#969;</strong> = Velocidad angular (rad/s)</li>
+                        <li><strong>E<sub>back</sub></strong> = Fuerza contraelectromotriz (V)</li>
+                        <li><strong>k<sub>e</sub></strong> = Constante constructiva del motor</li>
+                        <li><strong>\(\omega\)</strong> = Velocidad angular en radianes/s</li>
                     </ul>
                 </div>
 
                 <!-- Card 5: Power -->
                 <div class="theory-card">
                     <div class="card-header">
-                        <svg class="card-icon" viewBox="0 0 50 50" width="50" height="50">
+                        <svg class="card-icon" viewBox="0 0 50 50" width="46" height="46">
                             <circle cx="25" cy="25" r="23" fill="none" stroke="#ff4488" stroke-width="1.5" opacity="0.4"/>
                             <path d="M25 10 L28 20 L38 20 L30 27 L33 37 L25 30 L17 37 L20 27 L12 20 L22 20 Z" fill="none" stroke="#ff4488" stroke-width="1.5"/>
                         </svg>
-                        <h3>Potencia</h3>
+                        <h3>Balance de Potencia y Eficiencia</h3>
                     </div>
                     <div class="formula-box">
-                        <span class="formula">P = V · I = &#964; · &#969;</span>
+                        <span class="formula">P<sub>eléc</sub> = V &middot; I  &nbsp;&bull;&nbsp;  P<sub>mec</sub> = \(\tau\) &middot; \(\omega\)</span>
                     </div>
-                    <p>La potencia electrica consumida por el motor se transforma en potencia mecanica. La eficiencia del motor depende de las perdidas por calor en la resistencia del bobinado.</p>
+                    <p>La potencia eléctrica extraída de la fuente se divide en trabajo mecánico rotacional útil y pérdidas térmicas disipadas por calor en la resistencia interna (\(I^2 R\)).</p>
                     <ul class="formula-desc">
-                        <li><strong>P</strong> = Potencia electrica (W)</li>
-                        <li><strong>V</strong> = Voltaje (V)</li>
-                        <li><strong>I</strong> = Corriente (A)</li>
+                        <li><strong>P<sub>eléc</sub></strong> = Potencia eléctrica absorbida (W)</li>
+                        <li><strong>P<sub>mec</sub></strong> = Potencia mecánica en el eje (W)</li>
+                        <li><strong>\(\eta\)</strong> = Eficiencia porcentual \((P_{\text{mec}} / P_{\text{eléc}}) \times 100\)</li>
                     </ul>
                 </div>
 
                 <!-- Card 6: Commutator -->
                 <div class="theory-card">
                     <div class="card-header">
-                        <svg class="card-icon" viewBox="0 0 50 50" width="50" height="50">
+                        <svg class="card-icon" viewBox="0 0 50 50" width="46" height="46">
                             <circle cx="25" cy="25" r="23" fill="none" stroke="#ffcc00" stroke-width="1.5" opacity="0.4"/>
                             <circle cx="25" cy="25" r="10" fill="none" stroke="#ffcc00" stroke-width="2"/>
                             <line x1="25" y1="15" x2="25" y2="35" stroke="#ffcc00" stroke-width="2"/>
                             <circle cx="18" cy="25" r="2" fill="#ffcc00"/>
                             <circle cx="32" cy="25" r="2" fill="#ffcc00"/>
                         </svg>
-                        <h3>Conmutador</h3>
+                        <h3>Conmutador y Escobillas</h3>
                     </div>
                     <div class="formula-box">
-                        <span class="formula">Inversion cada 180&#176;</span>
+                        <span class="formula">Inversión de polaridad cada 180°</span>
                     </div>
-                    <p>El conmutador es un interruptor mecanico que invierte periodicamente el sentido de la corriente en la bobina cada media vuelta (180&#176;). Esto asegura que el torque siempre se produzca en la misma direccion, manteniendo la rotacion continua.</p>
+                    <p>Interruptor mecánico rotativo que invierte la corriente cada media vuelta. Evita que la espira se frene al cruzar la línea neutra magnética, manteniendo el torque positivo en un único sentido continuo.</p>
                     <ul class="formula-desc">
-                        <li>Cuando la bobina alcanza la posicion vertical, los segmentos del conmutador cambian de contacto, invirtiendo la corriente.</li>
+                        <li>Al cruzar el plano vertical, las delgas alternan contacto con las escobillas de grafito para asegurar giro unidireccional.</li>
+                    </ul>
+                </div>
+
+                <!-- Card 7: Joule Heating & Thermal Runaway Hazard -->
+                <div class="theory-card hazard-theory-card">
+                    <div class="card-header">
+                        <svg class="card-icon" viewBox="0 0 50 50" width="46" height="46">
+                            <circle cx="25" cy="25" r="23" fill="none" stroke="#ff3344" stroke-width="1.5" opacity="0.6"/>
+                            <path d="M25 12 L35 32 L15 32 Z" fill="none" stroke="#ff3344" stroke-width="2"/>
+                            <line x1="25" y1="20" x2="25" y2="25" stroke="#ff3344" stroke-width="2"/>
+                            <circle cx="25" cy="29" r="1.5" fill="#ff3344"/>
+                        </svg>
+                        <h3 style="color:#ff6688;">Efecto Joule y Límites de Seguridad</h3>
+                    </div>
+                    <div class="formula-box" style="border-color: rgba(255, 68, 102, 0.4); background: rgba(255, 68, 102, 0.08);">
+                        <span class="formula" style="color:#ff6688;">P<sub>calor</sub> = I<sup>2</sup> &middot; R  &nbsp;&bull;&nbsp;  V<sub>ruptura</sub> &gt; V<sub>dieléctrico</sub></span>
+                    </div>
+                    <p>La energía disipada como calor crece de forma cuadrática con la corriente. Si la disipación sobrepasa la capacidad de enfriamiento (&gt; 50W), el esmalte de cobre se degrada a 180°C, originando cortocircuito entre espiras, chispas por arco voltaico y combustión de resinas.</p>
+                    <ul class="formula-desc">
+                        <li><strong>Sobrevoltaje:</strong> Perfora el aislamiento dieléctrico y genera chispas destructivas entre delgas.</li>
+                        <li><strong>Sobrecorriente:</strong> Fusión térmica del devanado de cobre.</li>
+                        <li><strong>Protección activa:</strong> Disyuntor térmico con desconexión temporizada.</li>
                     </ul>
                 </div>
             </div>
@@ -844,9 +1127,11 @@
             <div class="about-content">
                 <div class="about-card">
                     <h3>ElectroSpin</h3>
-                    <p>Simulador web interactivo para el analisis y visualizacion de un motor de corriente continua (DC). Desarrollado como herramienta educativa que conecta los principios de Electricidad y Magnetismo con concepts de Ingenieria de Sistemas.</p>
+                    <p>
+                        Simulador web interactivo de alto rendimiento para el análisis, diagnóstico y visualización física de un motor de corriente continua (DC). Desarrollado como plataforma pedagógica de ingeniería que integra los principios de Electricidad, Magnetismo y Termodinámica aplicada con técnicas avanzadas de desarrollo frontend.
+                    </p>
                     <div class="about-authors">
-                        <h4>Autors</h4>
+                        <h4>Autores del Proyecto</h4>
                         <ul>
                             <li>Julian Alejandro Gil Peralta</li>
                             <li>Daniel Ramiro Galeano Teyes</li>
@@ -854,7 +1139,7 @@
                         </ul>
                     </div>
                     <div class="about-info">
-                        <span>Ingenieria de Sistemas - 2026</span>
+                        <span>Facultad de Ingeniería de Sistemas &bull; 2026</span>
                     </div>
                 </div>
             </div>
@@ -864,11 +1149,11 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
-            <svg class="footer-logo" viewBox="0 0 40 40" width="30" height="30">
+            <svg class="footer-logo" viewBox="0 0 40 40" width="28" height="28" aria-hidden="true">
                 <circle cx="20" cy="20" r="18" fill="none" stroke="#00c8ff" stroke-width="1" opacity="0.5"/>
                 <circle cx="20" cy="20" r="4" fill="#00c8ff" opacity="0.6"/>
             </svg>
-            <span>ElectroSpin 2026 - Motor DC Simulator</span>
+            <span>ElectroSpin 2026 &mdash; Simulador Interactivo de Motor DC y Diagnóstico de Seguridad</span>
         </div>
     </footer>
 
