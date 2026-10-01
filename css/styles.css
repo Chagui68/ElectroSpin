@@ -687,21 +687,6 @@ body {
     flex-shrink: 0;
 }
 
-.motor-note {
-    margin-top: 1rem;
-    padding: 0.85rem 1.1rem;
-    font-size: 0.8rem;
-    line-height: 1.65;
-    color: var(--text-secondary);
-    background: rgba(0, 200, 255, 0.04);
-    border: 1px solid rgba(0, 200, 255, 0.12);
-    border-radius: 10px;
-}
-
-.motor-note strong {
-    color: var(--accent-cyan);
-}
-
 /* =============================================
    Safety & Stress Diagnostic Monitor Card
    ============================================= */
