@@ -1,0 +1,14 @@
+# Configuración local del entorno de desarrollo
+.claude/
+.idea/
+# Grafo de conocimiento generado por graphify
+graphify-out/
+
+# Dependencias y capturas temporales de las herramientas de la figura
+node_modules/
+tools/anatomy/**/*.png
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
