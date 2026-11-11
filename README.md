@@ -6,48 +6,46 @@ Simulador web interactivo de alto rendimiento para el análisis, diagnóstico f�
 
 | Sección | Descripción |
 |---------|-------------|
-| **Vista Anatómica y 2D** | Figura isométrica en corte de un motor DC de imanes permanentes (~70 piezas: carcasa, imanes N/S, inducido laminado, devanado de cobre, colector de 24 delgas, escobillas con muelle, anillo portaescobillas, rodamientos, tapas, polea, bornera y cables). Al pasar el cursor o elegir una pieza de la lista se resalta y se muestra su descripción y su relación con las variables del simulador. La cámara se gira arrastrando (azimut 15°–80°, elevación 12°–58°), se acerca con la rueda o pellizcando y se desplaza con Mayús/botón derecho; el botón «Desmontar» (o el deslizador «Despiece») separa el motor en el orden real de desarme: cables, polea y tapas, anillo portaescobillas y, por último, el inducido. El inducido gira con la velocidad simulada, el devanado se enrojece con la pérdida Joule y saltan chispas en las escobillas con sobrevoltaje. Alterna con el esquema 2D en cualquier momento. |
-| **Barra de Escenarios (Presets)** | Botones de prueba rápida para cargar instantáneamente regímenes operativos: *Nominal Seguro (12V)*, *Sobrevoltaje (24V)*, *Sobrecarga Térmica (30V, 1Ω)*, *Sobrevelocidad Crítica* y *Máxima Eficiencia*. |
-| **Sistema de Diagnóstico y Seguridad** | Monitor de estrés global con barra dinámica de sobrecarga (0% a 150%+), chips de estado en tiempo real (Tensión, Corriente, Pérdida Joule $I^2R$, Velocidad RPM), aviso emergente interactivo y disyuntor térmico con disparo automático. |
-| **Panel de Control** | Deslizadores interactivos con marcadores de zonas seguras y peligrosas: Voltaje (V: 0 a 30V), Resistencia del bobinado (R: 0.5 a 50Ω), Campo magnético (B: 0.05 a 2.0T), Longitud del conductor (L: 0.05 a 0.50m), Vueltas de la bobina (N: 10 a 500) y Radio del rotor (r: 0.01 a 0.15m). |
-| **Lecturas en Tiempo Real** | Velocidad (RPM), corriente (I), par (τ), fuerza de Lorentz (F), potencia eléctrica (P), contrafem y eficiencia (η), en una franja sobre el visor. |
+| **Vista anatómica** | Figura isométrica en corte de un motor DC de imanes permanentes (~70 piezas: carcasa, imanes N/S, inducido laminado, devanado de cobre, colector de 24 delgas, escobillas con muelle, anillo portaescobillas, rodamientos, tapas, polea, bornera y cables). Al pasar el cursor o elegir una pieza de la lista se resalta y se muestra su descripción y su relación con las variables del simulador. La cámara se gira arrastrando (azimut 15°–80°, elevación 12°–58°), se acerca con la rueda o pellizcando y se desplaza con Mayús o el botón derecho; doble clic vuelve a la vista inicial. «Desmontar» (o el deslizador «Despiece») separa el motor en el orden real de desarme: cables, polea y tapas, anillo portaescobillas y, por último, el inducido. |
+| **Esquema 2D** | Vista alternativa de una sola espira entre los polos N y S, con el sentido de la corriente (▲/▼) y de la fuerza (⊙/⊗) según F = I·L × B; el colector invierte la corriente de cada lado al cruzar el plano neutro. |
+| **Lecturas en tiempo real** | Velocidad (RPM), corriente (I), par (τ), fuerza de Lorentz (F), potencia eléctrica (P), contrafem y eficiencia (η), en una franja sobre el visor. |
+| **Panel de control** | Iniciar/detener, reiniciar y ajuste seguro; escenarios de prueba; seis deslizadores: tensión V (0–30 V), resistencia R (0,5–50 Ω), campo B (0,05–2 T), longitud activa L (0,05–0,5 m), vueltas N (10–500) y radio del rotor r (0,01–0,15 m). |
+| **Escenarios** | *Nominal 12 V* (12 V, 5 Ω), *Máxima eficiencia* (16 V, 10 Ω, 1,2 T), *Sobrevoltaje* (25 V), *Sobrevelocidad* (26 V con B = 0,05 T) y *Sobrecarga térmica* (28 V, 1 Ω). |
+| **Seguridad** | Índice de estrés global, indicadores de tensión, corriente, calor I²R y velocidad con su límite, ventana de diagnóstico y disyuntor térmico con disparo automático. |
 | **Cómo funciona** | Seis tarjetas con las ecuaciones que resuelve el simulador (Lorentz, par, Ley de Ohm del inducido, contrafem, conmutación, potencia y calor) y los deslizadores que afectan a cada una. |
 
 ---
 
-## Mecánica de Alerta y Protección de Seguridad
+## Límites de seguridad
 
-El simulador incorpora un sistema activo de advertencias que le indica al usuario el problema exacto y las consecuencias físicas cuando se exceden los límites tolerables:
+Cada magnitud tiene un umbral de precaución y uno crítico. Al pasar a zona crítica se abre la ventana de diagnóstico con el problema, lo que le ocurriría a un motor real y qué hacer.
 
-1. **⚡ Sobrevoltaje Crítico (\(V > 18\text{V} - 22\text{V}\)):**
-   - **Problema:** La tensión aplicada supera la rigidez dieléctrica del aire y aislantes entre las delgas del conmutador.
-   - **Consecuencias reales:** Se produce una ruptura dieléctrica que genera chispas y arco eléctrico destructivo permanente en las escobillas de grafito, carbonizando los contactos y arriesgando un cortocircuito hacia la carcasa.
-2. **🔥 Sobrecorriente y Pérdida Joule Extrema (\(I > 4.5\text{A}\) o \(I^2 R > 50\text{W}\)):**
-   - **Problema:** Resistencia muy baja (\(R < 2\ \Omega\)) combinada con alta tensión provoca un consumo desmedido de amperios.
-   - **Consecuencias reales:** El calor disipado por efecto Joule derrite el esmalte de barniz de poliimida de las espiras a más de 180°C, originando cortocircuito interno entre espiras contiguas, desprendimiento de humo denso y peligro inminente de combustión/fuego.
-3. **🌪️ Sobrevelocidad Mecánica (\(\text{RPM} > 3000\text{ - }3300\text{ RPM}\)):**
-   - **Problema:** Campo magnético débil (\(B < 0.1\text{T}\)) o sobretensión extrema sin carga que elimina la contrafem protectora.
-   - **Consecuencias reales:** Las fuerzas centrífugas deforman y desprenden los alambres de cobre del inducido, causando vibraciones de resonancia violenta y gripado de rodamientos.
-4. **🛡️ Disparo Automático del Disyuntor Térmico:**
-   - Si el motor se mantiene operando en sobrecarga crítica por más de 5 segundos consecutivos, el sistema de protección corta la corriente automáticamente (*TRIP*) para simular un fusible bimetálico real, protegiendo el devanado. El usuario puede rearmarlo con un clic.
-5. **Aviso Emergente (Modal de Seguridad):**
-   - Salta automáticamente en pantalla con un resumen técnico detallado del diagnóstico, las consecuencias y opciones de solución rápida (*"Calibrar a Parámetros Seguros (12V)"* o *"Continuar en Modo Experimental"*).
+| Magnitud | Precaución | Crítico | Qué ocurriría en un motor real |
+|----------|-----------|---------|--------------------------------|
+| Tensión V | > 18 V | > 22 V | Arco entre delgas del colector y carbonización de las escobillas. |
+| Corriente I | > 3,5 A | > 5 A | Sobrecalentamiento del bobinado. |
+| Calor I²R | > 35 W | > 55 W | El esmalte de las espiras se degrada (> 180 °C): cortocircuito entre espiras, humo y riesgo de fuego. |
+| Resistencia R | — | < 2 Ω con V ≥ 12 V | Condición de casi cortocircuito. |
+| Velocidad | > 2800 RPM | > 3300 RPM | Deformación del devanado por fuerza centrífuga y daño en los rodamientos. |
+
+- **Disyuntor térmico:** si el motor sigue en zona crítica más de 5 segundos seguidos, corta la alimentación. Se rearma con un clic.
+- **Ventana de diagnóstico:** ofrece «Parámetros seguros (12 V)» o «Seguir en modo experimental».
 
 ---
 
-## Efectos Visuales y Sonoros
+## Efectos visuales y sonoros
 
-- **Arco voltaico dinámico (Chispas):** Generación vectorial en tiempo real de rayos y chispas eléctricas entre las delgas del conmutador y las escobillas.
-- **Calentamiento incandescente:** El color del bobinado transiciona de cobre dorado a naranja vivo y rojo incandescente al aumentar la disipación térmica.
-- **Partículas de humo:** Partículas animadas en SVG que se elevan desde el inducido cuando la temperatura sobrepasa el límite seguro.
-- **Vibración mecánica:** Efecto de temblor en el chasis cuando el régimen sobrepasa las 3000 RPM.
-- **Sintetizador Web Audio API:** Zumbido de motor con frecuencia modulada por la velocidad angular (\(\omega\)), chasquidos de chispas, pitido de alerta y sonido de corte de disyuntor.
+- **Chispas** en las escobillas con más de 19 V o más de 4,2 A, en ambas vistas.
+- **Calentamiento:** el devanado pasa de cobre a rojo al aumentar la pérdida Joule.
+- **Humo** (esquema 2D) cuando el calor supera 45 W.
+- **Vibración** del esquema 2D por encima de 2800 RPM.
+- **Sonido (Web Audio API):** zumbido cuya frecuencia sigue a la velocidad angular ω, chasquidos de chispas, pitido de alerta y corte del disyuntor. Se activa con el botón del altavoz.
 
 ---
 
 ## Cómo Ejecutar
 
-No requiere compilación ni dependencias externas: es HTML5, CSS3 y JavaScript moderno nativo.
+No requiere compilación ni dependencias para usarse: es HTML5, CSS3 y JavaScript nativo. Solo regenerar la vista anatómica necesita Node 18+.
 
 **Opción 1 - Abrir directamente:**
 Haz doble clic sobre el archivo `index.html` en tu navegador favorito.
@@ -64,7 +62,7 @@ Luego accede a `http://localhost:8000`.
 
 ```
 ElectroSpin/
-├── index.html              # Estructura semántica, SVG del motor, modal de alerta y diagnóstico
+├── index.html              # Página: visor, panel de control, «Cómo funciona» y ventana de diagnóstico
 ├── css/
 │   ├── styles.css          # Diseño de la página (grafito + cobre), modal y responsive
 │   ├── iso.css             # Estilos del kit isométrico (generado)
