@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Motor anatomy preview</title>
+<link rel="stylesheet" href="../../css/iso.css"><link rel="stylesheet" href="../../css/motor-anatomy.css">
+<style>body{margin:0;padding:24px;background:var(--anatomy-page);font:14px system-ui}</style></head>
+<body class="iso" data-theme="light">
+<div class="ma-anatomy">
+  <figure class="iso-figure" style="margin:0"><div class="iso-plate ma-plate">
+    <div class="iso-plate-corners" aria-hidden="true"><span class="iso-plate-corner" data-corner="fig">Fig 1</span><span class="iso-plate-corner" data-corner="title">Motor DC en corte</span><span class="iso-plate-corner" data-corner="hint">Pasa el cursor sobre una pieza</span><span class="iso-plate-corner" data-corner="readout" id="ro"></span></div>
+    <div class="ma-stage" id="stage"></div></div><div class="ma-toolbar" id="tools"></div></figure>
+  <div class="ma-side"><div class="ma-info" id="info"></div><ol class="ma-list" id="list"></ol></div>
+</div>
+<script src="../../js/motor-anatomy.js"></script>
+<script>
+motorAnatomy.mount({ stage: stage, list: list, info: info, readout: ro, toolbar: tools });
+const q = new URLSearchParams(location.search);
+if (q.get("t")) motorAnatomy.explode(+q.get("t"));
+const st = { running: true, breakerTripped: false, omega: +(q.get("w") || 150), voltage: +(q.get("v") || 12), current: 1.6, torque: 0.08, powerJouleLoss: +(q.get("j") || 5) };
+let last = performance.now();
+(function loop(now) { motorAnatomy.update(st, Math.min(0.05, (now - last) / 1000)); last = now; requestAnimationFrame(loop); })(last);
+</script>
+</body></html>

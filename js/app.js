@@ -28,7 +28,6 @@ const motorHazardBorder = document.getElementById('motorHazardBorder');
 const motorAlertHUD = document.getElementById('motorAlertHUD');
 const sparksGroup = document.getElementById('sparksGroup');
 const smokeGroup = document.getElementById('smokeGroup');
-const bgHazardGlow = document.getElementById('bgHazardGlow');
 
 // Sliders
 const voltageSlider = document.getElementById('voltageSlider');
@@ -50,7 +49,6 @@ const radiusValue = document.getElementById('radiusValue');
 const currentReading = document.getElementById('currentReading');
 const forceReading = document.getElementById('forceReading');
 const torqueReading = document.getElementById('torqueReading');
-const omegaReading = document.getElementById('omegaReading');
 const rpmReading = document.getElementById('rpmReading');
 const powerReading = document.getElementById('powerReading');
 const backEmfReading = document.getElementById('backEmfReading');
@@ -497,7 +495,6 @@ function updateReadings() {
     currentReading.textContent = p.current.toFixed(2) + ' A';
     forceReading.textContent = p.force.toFixed(3) + ' N';
     torqueReading.textContent = p.torque.toFixed(4) + ' N\u00B7m';
-    omegaReading.textContent = state.omega.toFixed(1) + ' rad/s';
     rpmReading.textContent = currentRpm.toFixed(0) + ' rpm';
     rpmValueSVG.textContent = currentRpm.toFixed(0) + ' RPM';
     powerReading.textContent = p.powerElectrical.toFixed(2) + ' W';
@@ -532,70 +529,49 @@ function updateReadings() {
     const barWidth = Math.min(100, (health.stressIndex / 140) * 100);
     stressBarFill.style.width = barWidth + '%';
 
-    if (health.severity === 'critical') {
-        stressBarFill.style.background = 'linear-gradient(90deg, #ff8800, #ff3344)';
-        stressPercentText.style.color = '#ff4466';
-        stressPercentText.textContent = `${health.stressIndex}% [¡PELIGRO CRÍTICO!]`;
-    } else if (health.severity === 'warning') {
-        stressBarFill.style.background = 'linear-gradient(90deg, #44ff88, #ffb703)';
-        stressPercentText.style.color = '#ffb703';
-        stressPercentText.textContent = `${health.stressIndex}% [Precaución]`;
-    } else {
-        stressBarFill.style.background = 'linear-gradient(90deg, #44ff88, #00c8ff)';
-        stressPercentText.style.color = '#44ff88';
-        stressPercentText.textContent = `${health.stressIndex}% [Seguro]`;
-    }
+    stressPercentText.textContent = `${health.stressIndex}%`;
+    // Colores de la página según la severidad (ver [data-severity] en styles.css)
+    document.body.dataset.severity = state.breakerTripped ? 'tripped' : health.severity;
 
     // Actualizar Header Badge y Estado
     if (state.breakerTripped) {
         headerSafetyBadge.className = 'header-safety-badge danger';
         headerSafetyText.textContent = 'Disyuntor Disparado';
-        safetyIconIndicator.textContent = '💥';
         safetyStatusSub.textContent = 'Circuito desconectado automáticamente por protección térmica.';
-        safetyStatusSub.style.color = '#ff6677';
-        safetyMonitorSection.className = 'panel-section safety-monitor-section is-danger';
+        safetyMonitorSection.className = 'panel-block safety-monitor-section is-danger';
         motorContainerCard.classList.add('is-hazardous');
         breakerTripBanner.style.display = 'flex';
     } else if (health.severity === 'critical') {
         headerSafetyBadge.className = 'header-safety-badge danger';
         headerSafetyText.textContent = '¡Peligro Crítico!';
-        safetyIconIndicator.textContent = '🚨';
         safetyStatusSub.textContent = '¡Sobrecarga extrema! Peligro de daño físico inminente al motor.';
-        safetyStatusSub.style.color = '#ff6677';
-        safetyMonitorSection.className = 'panel-section safety-monitor-section is-danger';
+        safetyMonitorSection.className = 'panel-block safety-monitor-section is-danger';
         motorContainerCard.classList.add('is-hazardous');
         breakerTripBanner.style.display = 'none';
 
         // Alerta visual de fondo y marco
-        bgHazardGlow.style.opacity = '1';
         motorHazardBorder.style.opacity = '0.9';
         motorHazardBorder.classList.add('pulsing');
         motorAlertHUD.style.opacity = '1';
     } else if (health.severity === 'warning') {
         headerSafetyBadge.className = 'header-safety-badge warning';
         headerSafetyText.textContent = 'Advertencia';
-        safetyIconIndicator.textContent = '⚠️';
         safetyStatusSub.textContent = 'Valores elevados cerca del umbral de fatiga térmica.';
-        safetyStatusSub.style.color = '#ffb703';
-        safetyMonitorSection.className = 'panel-section safety-monitor-section is-warning';
+        safetyMonitorSection.className = 'panel-block safety-monitor-section is-warning';
         motorContainerCard.classList.remove('is-hazardous');
         breakerTripBanner.style.display = 'none';
 
-        bgHazardGlow.style.opacity = '0.4';
         motorHazardBorder.style.opacity = '0';
         motorHazardBorder.classList.remove('pulsing');
         motorAlertHUD.style.opacity = '0';
     } else {
         headerSafetyBadge.className = 'header-safety-badge';
         headerSafetyText.textContent = 'Estado: Seguro';
-        safetyIconIndicator.textContent = '🛡️';
         safetyStatusSub.textContent = 'Parámetros operativos dentro del rango seguro.';
-        safetyStatusSub.style.color = 'var(--text-muted)';
-        safetyMonitorSection.className = 'panel-section safety-monitor-section';
+        safetyMonitorSection.className = 'panel-block safety-monitor-section';
         motorContainerCard.classList.remove('is-hazardous');
         breakerTripBanner.style.display = 'none';
 
-        bgHazardGlow.style.opacity = '0';
         motorHazardBorder.style.opacity = '0';
         motorHazardBorder.classList.remove('pulsing');
         motorAlertHUD.style.opacity = '0';
@@ -757,9 +733,6 @@ function restoreSafeParameters() {
     updateReadings();
     updateFieldLines();
     updateCoil();
-    if (window.motor3D && motor3D.initialized) {
-        motor3D.updateGeometry(state);
-    }
     closeHazardModal();
 }
 
@@ -781,9 +754,6 @@ function rearmBreaker() {
     updateSliderLabels();
     updateReadings();
     updateCoil();
-    if (window.motor3D && motor3D.initialized) {
-        motor3D.updateGeometry(state);
-    }
 }
 
 /**
@@ -856,9 +826,6 @@ function applyPreset(presetType) {
     updateReadings();
     updateFieldLines();
     updateCoil();
-    if (window.motor3D && motor3D.initialized) {
-        motor3D.updateGeometry(state);
-    }
 }
 
 /**
@@ -971,6 +938,11 @@ function updateCoil() {
     const front = sin >= 0;
     const frontX = front ? fX : bX;
     const backX = front ? bX : fX;
+    // Con B hacia la derecha (N→S) y el ángulo creciendo, F = I·L × B empuja el lado derecho hacia el
+    // observador (⊙) y el izquierdo hacia el fondo (⊗); para eso la corriente sube por el lado izquierdo
+    // y baja por el derecho. El colector invierte la corriente de cada lado al cruzar el centro
+    // (bobina perpendicular a B, par nulo), no en 0°/180°.
+    const frontOnRight = frontX >= backX;
 
     const pts = [
         cx + r * cos, cy - h,
@@ -1030,6 +1002,8 @@ function updateCoil() {
     const frontY = cy - h * 0.55;
     const backY = cy + h * 0.55;
 
+    forceSymbolFront.textContent = frontOnRight ? '⊙' : '⊗';
+    forceSymbolBack.textContent = frontOnRight ? '⊗' : '⊙';
     forceSymbolFront.setAttribute('x', frontX);
     forceSymbolFront.setAttribute('y', frontY);
     forceSymbolFront.setAttribute('fill', color);
@@ -1050,10 +1024,8 @@ function updateCoil() {
     forceLabelBack.setAttribute('visibility', showForce ? 'visible' : 'hidden');
 
     // Flechas de corriente
-    const half = Math.floor(state.angle / Math.PI) % 2;
-    const up = half === 0;
-    currentArrowFront.textContent = up ? '\u25B2' : '\u25BC';
-    currentArrowBack.textContent = up ? '\u25BC' : '\u25B2';
+    currentArrowFront.textContent = frontOnRight ? '\u25BC' : '\u25B2';
+    currentArrowBack.textContent = frontOnRight ? '\u25B2' : '\u25BC';
     currentArrowFront.setAttribute('x', frontX);
     currentArrowFront.setAttribute('y', cy + 6);
     currentArrowBack.setAttribute('x', backX);
@@ -1112,10 +1084,8 @@ function animate(time) {
     updateDynamicSparks();
     updateDynamicSmoke();
 
-    // Actualizar renderizado 3D WebGL
-    if (window.motor3D && motor3D.initialized) {
-        motor3D.update(state, dt);
-    }
+    // Vista anatómica: rotor, chispas, calor y lectura
+    if (window.motorAnatomy) motorAnatomy.update(state, dt);
 
     requestAnimationFrame(animate);
 }
@@ -1205,12 +1175,12 @@ function resetSimulation() {
     updateReadings();
     updateFieldLines();
     updateCoil();
-    if (window.motor3D && motor3D.initialized) {
-        motor3D.updateGeometry(state);
-    }
 }
 
 function updateSliderLabels() {
+    for (const slider of [voltageSlider, resistanceSlider, bFieldSlider, lengthSlider, turnsSlider, radiusSlider]) {
+        slider.style.setProperty('--p', ((slider.value - slider.min) / (slider.max - slider.min) * 100).toFixed(1) + '%');
+    }
     voltageValue.textContent = state.voltage.toFixed(1) + ' V';
     resistanceValue.textContent = state.resistance.toFixed(1) + ' \u2126';
     bFieldValue.textContent = state.bField.toFixed(2) + ' T';
@@ -1246,9 +1216,6 @@ function setupControls() {
             updateReadings();
             updateFieldLines();
             updateCoil();
-            if (window.motor3D && motor3D.initialized) {
-                motor3D.updateGeometry(state);
-            }
         });
     }
 
@@ -1269,7 +1236,7 @@ function setupControls() {
 
 /**
  * =============================================
- * Controladores de la Vista 3D WebGL
+ * Selector de vista (anatómica / esquema 2D)
  * =============================================
  */
 function switchViewerMode(mode) {
@@ -1283,44 +1250,12 @@ function switchViewerMode(mode) {
         wrapper2D.style.display = 'none';
         btn3D.classList.add('active');
         btn2D.classList.remove('active');
-        if (window.motor3D) motor3D.onResize();
     } else {
         wrapper3D.style.display = 'none';
         wrapper2D.style.display = 'block';
         btn3D.classList.remove('active');
         btn2D.classList.add('active');
     }
-}
-
-function set3DCam(viewType) {
-    if (!window.motor3D) return;
-    motor3D.setCameraView(viewType);
-    document.querySelectorAll('.cam-presets .cam-btn').forEach(b => b.classList.remove('active'));
-
-    const idMap = {
-        'isometric': 'camIso',
-        'front': 'camFront',
-        'top': 'camTop',
-        'commutator': 'camComm'
-    };
-    const btn = document.getElementById(idMap[viewType]);
-    if (btn) btn.classList.add('active');
-}
-
-function toggleVectorsOverlay() {
-    if (!window.motor3D) return;
-    const btn = document.getElementById('btnVectorsToggle');
-    const nextState = !motor3D.showVectors;
-    motor3D.toggleVectors(nextState);
-    btn.textContent = nextState ? 'Vectores: ON' : 'Vectores: OFF';
-    btn.classList.toggle('active', nextState);
-}
-
-function toggle3DAutoRotate() {
-    if (!window.motor3D) return;
-    const btn = document.getElementById('btnAutoRotate');
-    const active = motor3D.toggleAutoRotate();
-    btn.classList.toggle('active', active);
 }
 
 function setupScrollSpy() {
@@ -1352,11 +1287,15 @@ function init() {
     updateFieldLines();
     updateCoil();
 
-    // Inicializar visualizador 3D WebGL (Three.js)
-    const canvas3D = document.getElementById('motor3DCanvas');
-    if (canvas3D && window.motor3D) {
-        motor3D.init(canvas3D);
-        motor3D.updateGeometry(state);
+    // Vista anatómica del motor (figura isométrica en corte)
+    if (window.motorAnatomy) {
+        motorAnatomy.mount({
+            stage: document.getElementById('anatomyStage'),
+            list: document.getElementById('anatomyList'),
+            info: document.getElementById('anatomyInfo'),
+            readout: document.getElementById('anatomyReadout'),
+            toolbar: document.getElementById('anatomyToolbar')
+        });
     }
 
     requestAnimationFrame((t) => {

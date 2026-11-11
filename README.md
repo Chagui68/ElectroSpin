@@ -6,13 +6,12 @@ Simulador web interactivo de alto rendimiento para el análisis, diagnóstico f�
 
 | Sección | Descripción |
 |---------|-------------|
-| **Simulador 3D WebGL y 2D** | Visor 3D interactivo en tiempo real con WebGL y Three.js: orbitación 360°, zoom, paneo, vistas de cámara (isométrica, frontal, superior, conmutador), bobina volumétrica de cobre, eje cromado, conmutador con escobillas de grafito, flechas vectoriales 3D de Fuerza de Lorentz \(\vec{F}\) y Corriente \(\vec{I}\), flujo magnético tridimensional, chispas y humo 3D volumétrico, y opción de alternar al modo 2D en cualquier momento. |
+| **Vista Anatómica y 2D** | Figura isométrica en corte de un motor DC de imanes permanentes (~70 piezas: carcasa, imanes N/S, inducido laminado, devanado de cobre, colector de 24 delgas, escobillas con muelle, anillo portaescobillas, rodamientos, tapas, polea, bornera y cables). Al pasar el cursor o elegir una pieza de la lista se resalta y se muestra su descripción y su relación con las variables del simulador. La cámara se gira arrastrando (azimut 15°–80°, elevación 12°–58°), se acerca con la rueda o pellizcando y se desplaza con Mayús/botón derecho; el botón «Desmontar» (o el deslizador «Despiece») separa el motor en el orden real de desarme: cables, polea y tapas, anillo portaescobillas y, por último, el inducido. El inducido gira con la velocidad simulada, el devanado se enrojece con la pérdida Joule y saltan chispas en las escobillas con sobrevoltaje. Alterna con el esquema 2D en cualquier momento. |
 | **Barra de Escenarios (Presets)** | Botones de prueba rápida para cargar instantáneamente regímenes operativos: *Nominal Seguro (12V)*, *Sobrevoltaje (24V)*, *Sobrecarga Térmica (30V, 1Ω)*, *Sobrevelocidad Crítica* y *Máxima Eficiencia*. |
 | **Sistema de Diagnóstico y Seguridad** | Monitor de estrés global con barra dinámica de sobrecarga (0% a 150%+), chips de estado en tiempo real (Tensión, Corriente, Pérdida Joule $I^2R$, Velocidad RPM), aviso emergente interactivo y disyuntor térmico con disparo automático. |
 | **Panel de Control** | Deslizadores interactivos con marcadores de zonas seguras y peligrosas: Voltaje (V: 0 a 30V), Resistencia del bobinado (R: 0.5 a 50Ω), Campo magnético (B: 0.05 a 2.0T), Longitud del conductor (L: 0.05 a 0.50m), Vueltas de la bobina (N: 10 a 500) y Radio del rotor (r: 0.01 a 0.15m). |
-| **Lecturas en Tiempo Real** | Corriente neta (I), fuerza de Lorentz (F), torque mecánico (\(\tau\)), velocidad angular (\(\omega\)), régimen de giro (RPM), potencia eléctrica (P), contrafem (Back-EMF) y eficiencia porcentual (\(\eta\)). |
-| **Efecto de cada Variable** | Explicación pedagógica de cómo afecta cada parámetro a las ecuaciones físicas, a la animación y a la seguridad operativa. |
-| **Marco Teórico** | Tarjetas didácticas con fórmulas clave: Fuerza de Lorentz, Ley de Ohm, Torque, Back-EMF, Balance de Potencia, Conmutador e Inversión, y Efecto Joule con Límites de Seguridad Dieléctrica. |
+| **Lecturas en Tiempo Real** | Velocidad (RPM), corriente (I), par (τ), fuerza de Lorentz (F), potencia eléctrica (P), contrafem y eficiencia (η), en una franja sobre el visor. |
+| **Cómo funciona** | Seis tarjetas con las ecuaciones que resuelve el simulador (Lorentz, par, Ley de Ohm del inducido, contrafem, conmutación, potencia y calor) y los deslizadores que afectan a cada una. |
 
 ---
 
@@ -65,12 +64,23 @@ Luego accede a `http://localhost:8000`.
 
 ```
 ElectroSpin/
-├── index.html      # Estructura semántica, SVG del motor, modal de alerta y diagnóstico
+├── index.html              # Estructura semántica, SVG del motor, modal de alerta y diagnóstico
 ├── css/
-    └── styles.css  # Tema Cyber-Lab, animaciones de chispas/humo, modal y responsive
-└── js/
-    └── app.js      # Dinámica física, sistema de diagnóstico, Web Audio y presets
+│   ├── styles.css          # Diseño de la página (grafito + cobre), modal y responsive
+│   ├── iso.css             # Estilos del kit isométrico (generado)
+│   └── motor-anatomy.css   # Integración de la vista anatómica
+├── js/
+│   ├── app.js              # Dinámica física, sistema de diagnóstico, Web Audio y presets
+│   └── motor-anatomy.js    # Vista anatómica (generado: no editar a mano)
+└── tools/anatomy/
+    ├── figure.mjs          # Geometría del motor para cualquier cámara y grado de despiece
+    ├── build.mjs           # Empaqueta kit + figura + runtime → node tools/anatomy/build.mjs
+    ├── runtime.js          # Cámara, despiece, rotación, chispas, calor, piezas y descripciones
+    ├── preview.html        # Vista previa aislada de la figura
+    └── kit/                # Kit isométrico "anatomy" (MIT)
 ```
+
+Para cambiar la figura, edita `tools/anatomy/figure.mjs` o `runtime.js` y regenera con `node tools/anatomy/build.mjs` (Node 18+).
 
 ---
 
