@@ -2,6 +2,9 @@
 .ma-plate { --anatomy-paper: var(--anatomy-card); }
 .ma-stage { position: relative; cursor: crosshair; outline: none; }
 .ma-stage .iso-svg { width: 100%; max-width: 980px; margin: 0 auto; }
+/* The kit draws with overflow visible; zoom and pan move the viewBox, so clip to the frame. */
+.ma-stage { overflow: hidden; }
+.ma-stage .iso-svg { overflow: hidden; }
 
 /* Copper windings: the one coloured accent, warming toward red with Joule loss (--ma-heat 0..1). */
 .ma-stage svg { --ma-heat: 0; --ma-cu: #b8733a; --ma-hot: #e0482d; }
