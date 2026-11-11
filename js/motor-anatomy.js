@@ -2537,33 +2537,42 @@ function buildFigure({ azimuth = 50, elevation = 30, t = 0 } = {}) {
 
 return { FIGURE, STAGES, shareOf, buildFigure }; })();
 // Runtime for the anatomy motor figure. Inlined by build.mjs after k, G, T (kit) and figure.mjs (buildFigure).
+// Parts grouped by assembly, in the order the list shows them. desc: what it is; sim: how it shows in the simulator.
+const GROUPS = [
+  ["stator", "Estátor"],
+  ["rotor", "Inducido (rotor)"],
+  ["brushgear", "Escobillas"],
+  ["frame", "Estructura"],
+  ["supply", "Alimentación"],
+];
 const PARTS = [
-  { id: "yoke", name: "Carcasa / yugo del estator", desc: "Tubo de acero laminado en frío que sostiene los imanes y cierra el circuito magnético: el flujo sale del polo N, cruza el inducido, entra al polo S y regresa por la carcasa.", sim: "Sin carcasa el flujo se dispersa y B cae: el par τ = N·B·I·L·r baja en proporción." },
-  { id: "magnetN", name: "Imán permanente · polo N", desc: "Segmento de ferrita (o neodimio) pegado a la carcasa. Su cara curva deja un entrehierro uniforme de ~2 mm con el inducido.", sim: "Fija el campo B del deslizador «Campo magnético»." },
-  { id: "magnetS", name: "Imán permanente · polo S", desc: "Polo opuesto, enfrentado al N. Juntos crean un campo radial casi constante bajo cada polo, así el par no depende del ángulo.", sim: "Con B débil desaparece la contrafem: es el escenario «Sobrevelocidad»." },
-  { id: "core", name: "Núcleo del inducido", desc: "Paquete de chapas de acero al silicio de 0,5 mm aisladas entre sí (las líneas finas) para cortar las corrientes de Foucault. Sus 12 ranuras alojan el bobinado.", sim: "Su radio es el brazo de palanca r del par." },
-  { id: "winding", name: "Devanado del inducido", desc: "Hilo de cobre esmaltado en las ranuras; las cabezas de bobina asoman en cada extremo. Por él circula la corriente I que, dentro del campo B, recibe la fuerza de Lorentz F = B·I·L.", sim: "N vueltas y longitud L; se calienta por efecto Joule I²R (color)." },
-  { id: "commutator", name: "Colector (conmutador)", desc: "24 delgas de cobre aisladas con mica. Cada par de delgas está soldado a una bobina por las «risers» (puntos). Invierte la corriente en cada bobina cada media vuelta para que el par siempre empuje en el mismo sentido.", sim: "Por encima de ~19 V salta arco entre delgas: chispas en las escobillas." },
-  { id: "brushes", name: "Escobillas y portaescobillas", desc: "Bloques de carbón-grafito que rozan el colector, empujados por un muelle. La trenza de cobre (pigtail) lleva la corriente al borne del brazo.", sim: "Aquí entra la tensión V aplicada; las chispas aparecen con sobrevoltaje." },
-  { id: "rocker", name: "Anillo portaescobillas", desc: "Anillo aislante sujeto a la tapa por tres columnas; sitúa las escobillas en la línea neutra, a 90° eléctricos de los polos, donde la conmutación es más limpia.", sim: "Escobillas a 60° y 240°: perpendiculares al eje N–S de los imanes." },
-  { id: "shaft", name: "Eje", desc: "Eje de acero rectificado que atraviesa el núcleo y el colector y transmite el par a la polea.", sim: "Gira a la velocidad ω de las lecturas (rad/s y RPM)." },
-  { id: "bearing", name: "Rodamiento y buje", desc: "Rodamiento de bolas alojado en el buje de la tapa, con tapa de grasa atornillada. Soporta el eje y su carga radial.", sim: "Por encima de ~3000 RPM se agarrotan: riesgo de sobrevelocidad." },
-  { id: "bells", name: "Tapas (escudos) y tirante", desc: "Tapas de aluminio fundido con nervios; un tirante pasante las aprieta contra la carcasa. La delantera está cortada para ver el interior.", sim: "Estructura: no cambia la física del modelo." },
-  { id: "pulley", name: "Polea de transmisión", desc: "Polea de dos gargantas en V con chaveta, en el lado de accionamiento. Entrega la potencia mecánica P = τ·ω a la carga.", sim: "Potencia mecánica de las lecturas." },
-  { id: "leads", name: "Cables de alimentación", desc: "Conductores flexibles que llevan la corriente desde la bornera a cada brazo portaescobillas; el de la escobilla oculta rodea el interior de la carcasa. Son lo primero que se desconecta al desmontar.", sim: "Llevan la corriente I = (V − fem)/R." },
-  { id: "terminals", name: "Bornera (+ / −)", desc: "Bloque aislante con dos bornes roscados y tuercas moleteadas. Invertir la polaridad invierte el sentido de giro.", sim: "Tensión V del deslizador «Voltaje»." },
-  { id: "nameplate", name: "Placa de características", desc: "Datos nominales del fabricante: tensión, corriente, potencia y velocidad. Trabajar por encima de ellos dispara las alertas del simulador.", sim: "Régimen nominal = escenario «Nominal Seguro (12 V)»." },
-  { id: "feet", name: "Patas y placa base", desc: "Patas de fundición atornilladas a la placa del banco de pruebas, que absorben la reacción del par.", sim: "La reacción al par τ aparece aquí." },
+  { id: "yoke", group: "stator", name: "Carcasa (yugo)", desc: "Tubo de acero que sostiene los imanes y cierra el circuito magnético: el flujo sale del polo N, atraviesa el inducido, entra en el polo S y vuelve por la carcasa.", sim: "Si el yugo conduce mal el flujo, el campo B baja y con él el par." },
+  { id: "magnetN", group: "stator", name: "Imán · polo N", desc: "Segmento curvo de ferrita pegado a la carcasa. Su cara interior sigue la forma del inducido para dejar un entrehierro estrecho y uniforme.", sim: "Es el campo B del deslizador «Campo magnético»." },
+  { id: "magnetS", group: "stator", name: "Imán · polo S", desc: "Polo opuesto al N. Entre los dos crean un campo casi radial, de modo que el par apenas cambia mientras gira el rotor.", sim: "Con B muy débil casi no hay contrafem y el motor se embala: escenario «Sobrevelocidad»." },
+  { id: "core", group: "rotor", name: "Núcleo", desc: "Paquete de chapas de acero al silicio aisladas entre sí (las líneas finas) para reducir las corrientes de Foucault. Sus 12 ranuras alojan el bobinado.", sim: "Su radio es el brazo de palanca r: τ = F · r." },
+  { id: "winding", group: "rotor", name: "Devanado", desc: "Hilo de cobre esmaltado alojado en las ranuras; sus cabezas asoman en ambos extremos. La corriente que lo recorre, dentro del campo, recibe la fuerza de Lorentz.", sim: "Corresponde a N y L. Se enrojece al aumentar el calor I²R." },
+  { id: "commutator", group: "rotor", name: "Colector", desc: "24 delgas de cobre separadas por mica y soldadas a las bobinas (los puntos). Invierte la corriente de cada bobina en el momento justo para que el par empuje siempre en el mismo sentido.", sim: "Por encima de unos 19 V salta arco entre delgas y aparecen chispas." },
+  { id: "shaft", group: "rotor", name: "Eje", desc: "Eje de acero rectificado que une núcleo, colector y polea, y transmite el par a la carga.", sim: "Gira a la velocidad que muestran las lecturas." },
+  { id: "brushes", group: "brushgear", name: "Escobillas", desc: "Bloques de carbón-grafito que un muelle mantiene apoyados sobre el colector. Una trenza de cobre lleva la corriente hasta el borne del brazo.", sim: "Por aquí entra la tensión V; con sobrevoltaje es donde saltan las chispas." },
+  { id: "rocker", group: "brushgear", name: "Anillo portaescobillas", desc: "Anillo aislante sujeto a la tapa por tres columnas. Coloca las escobillas en la línea neutra, entre los polos, donde la conmutación produce menos chispa.", sim: "Fija la posición de las escobillas; no depende de ningún deslizador." },
+  { id: "bells", group: "frame", name: "Tapas y tirante", desc: "Tapas de aluminio fundido con nervios de refuerzo. Un tirante pasante las aprieta contra la carcasa; la delantera está cortada para ver el interior.", sim: "Pieza estructural: no cambia la física del modelo." },
+  { id: "bearing", group: "frame", name: "Rodamiento", desc: "Rodamiento de bolas alojado en el buje de la tapa y cerrado con una tapa atornillada. Centra el eje y soporta su carga.", sim: "Desde 2800 RPM hay aviso por desgaste; desde 3300 RPM, zona crítica." },
+  { id: "pulley", group: "frame", name: "Polea", desc: "Polea de dos gargantas en V fijada al eje con chaveta. Transmite la potencia mecánica a la máquina accionada.", sim: "Entrega la potencia mecánica τ · ω." },
+  { id: "nameplate", group: "frame", name: "Placa de características", desc: "Indica los valores nominales: tensión, corriente, potencia y velocidad. Superarlos de forma sostenida acorta la vida del motor.", sim: "El régimen nominal es el escenario «Nominal 12 V»." },
+  { id: "feet", group: "frame", name: "Patas y bancada", desc: "Patas de fundición atornilladas a la placa del banco de pruebas. Fijan el motor y absorben la reacción del par.", sim: "Reciben un par igual y opuesto al del eje." },
+  { id: "terminals", group: "supply", name: "Bornera", desc: "Bloque aislante con dos bornes roscados (+ y −) donde se conecta la fuente. Invertir la polaridad invierte el sentido de giro.", sim: "Es la tensión V del deslizador «Tensión»." },
+  { id: "leads", group: "supply", name: "Cables", desc: "Llevan la corriente desde la bornera hasta cada escobilla; el de la escobilla oculta rodea el interior de la carcasa. Es lo primero que se desconecta al desmontar.", sim: "Conducen la corriente I = (V − E) / R." },
 ];
 const ALIAS = { base: "feet" };
-// The order a technician takes the motor apart, shown under the drawing while it opens (see STAGES).
+// The order a technician takes the motor apart, shown next to the slider while it opens (see STAGES).
 const STEPS = [
   [0, "Montado"],
-  [0.001, "1 · Desconectar cables, sacar la polea y la tapa delantera"],
-  [0.4, "2 · Retirar el anillo portaescobillas con las escobillas"],
-  [0.66, "3 · Extraer el inducido por la ventana del estator"],
+  [0.001, "Paso 1 de 3 · Cables, polea y tapas"],
+  [0.4, "Paso 2 de 3 · Anillo portaescobillas"],
+  [0.66, "Paso 3 de 3 · Extraer el inducido"],
   [1, "Despiece completo"],
 ];
+const TIPS = [["Arrastrar", "girar"], ["Rueda", "acercar"], ["Mayús + arrastrar", "desplazar"], ["Doble clic", "vista inicial"]];
 
 const { W, H, CORE, COMM, SHAFT_R, BRUSH_AT, AZIMUTH, ELEVATION } = FIGURE;
 const DEG = Math.PI / 180;
@@ -2648,10 +2657,11 @@ function paintSelection() {
   if (listEl) listEl.querySelectorAll("[data-pick]").forEach((b) => { b.classList.toggle("active", b.dataset.pick === show); b.setAttribute("aria-pressed", String(b.dataset.pick === selected)); });
   if (infoEl) {
     const part = PARTS.find((p) => p.id === show);
-    const index = PARTS.indexOf(part);
+    const number = String(PARTS.indexOf(part) + 1).padStart(2, "0");
+    const group = part && GROUPS.find(([id]) => id === part.group)[1];
     infoEl.innerHTML = part
-      ? `<span class="ma-num">${String(index + 1).padStart(2, "0")}</span><div><h4>${part.name}</h4><p>${part.desc}</p><p class="ma-sim"><b>En el simulador:</b> ${part.sim}</p></div>`
-      : `<span class="ma-num">··</span><div><h4>Anatomía del motor</h4><p>Pasa el cursor sobre cualquier pieza, o elígela en la lista, para ver qué es y qué papel cumple; haz clic para fijarla. Arrastra para girar la cámara, usa la rueda para acercarte y pulsa «Desmontar» para ver cómo está construido.</p></div>`;
+      ? `<p class="ma-kicker">${group} · ${number}</p><h4>${part.name}</h4><p class="ma-desc">${part.desc}</p><div class="ma-sim"><span>En el simulador</span><p>${part.sim}</p></div>`
+      : `<p class="ma-kicker">${PARTS.length} piezas · ${GROUPS.length} conjuntos</p><h4>Explora el motor</h4><p class="ma-desc">Pasa el cursor sobre una pieza o elígela en la lista para saber qué es y qué hace. Haz clic para dejarla fijada.</p><ul class="ma-tips">${TIPS.map(([key, act]) => `<li><kbd>${key}</kbd>${act}</li>`).join("")}</ul>`;
   }
 }
 function hover(id) { id = id ? ALIAS[id] || id : null; if (id !== hovered) { hovered = id; paintSelection(); } }
@@ -2663,18 +2673,22 @@ function syncTools() {
   toolEls.explode.textContent = open ? "Montar" : "Desmontar";
   toolEls.explode.setAttribute("aria-pressed", String(open));
   if (document.activeElement !== toolEls.slider) toolEls.slider.value = String(Math.round(t * 100));
+  toolEls.slider.style.setProperty("--p", `${(t * 100).toFixed(1)}%`);
   const step = [...STEPS].reverse().find(([from]) => t >= from);
   toolEls.step.textContent = step[1];
-  toolEls.cam.textContent = `cámara ${Math.round(cam.azimuth)}° · ${Math.round(cam.elevation)}° · ${zoom.toFixed(1)}×`;
+  toolEls.cam.textContent = `${Math.round(cam.azimuth)}° · ${Math.round(cam.elevation)}° · ${zoom.toFixed(1)}×`;
 }
 
 function toolbarHtml() {
-  return `<button type="button" class="ma-tool ma-tool-main" data-tool="explode" aria-pressed="false">Desmontar</button>
-<label class="ma-range"><span>Despiece</span><input type="range" min="0" max="100" value="0" data-tool="slider" aria-label="Grado de despiece"></label>
-<span class="ma-tool-group"><button type="button" class="ma-tool" data-tool="zoomout" aria-label="Alejar">−</button><button type="button" class="ma-tool" data-tool="zoomin" aria-label="Acercar">+</button></span>
-<button type="button" class="ma-tool" data-tool="home">Vista inicial</button>
-<span class="ma-step" data-tool="step" aria-live="polite"></span>
-<span class="ma-cam" data-tool="cam"></span>`;
+  return `<div class="ma-tb-group">
+  <button type="button" class="ma-tool ma-tool-main" data-tool="explode" aria-pressed="false">Desmontar</button>
+  <div class="ma-progress"><div class="ma-progress-top"><label for="maExplode">Despiece</label><span class="ma-step" data-tool="step" aria-live="polite"></span></div><input id="maExplode" class="slider" type="range" min="0" max="100" value="0" data-tool="slider"></div>
+</div>
+<div class="ma-tb-group ma-tb-view">
+  <span class="ma-cam" data-tool="cam"></span>
+  <span class="ma-tool-group"><button type="button" class="ma-tool" data-tool="zoomout" aria-label="Alejar">−</button><button type="button" class="ma-tool" data-tool="zoomin" aria-label="Acercar">+</button></span>
+  <button type="button" class="ma-tool" data-tool="home">Vista inicial</button>
+</div>`;
 }
 
 function zoomAt(factor, sx = W / 2 + pan[0], sy = H / 2 + pan[1]) {
@@ -2774,7 +2788,7 @@ function mount({ stage: stageEl, list, info, readout, toolbar }) {
     toolEls.home.addEventListener("click", goHome);
   }
   if (list) {
-    list.innerHTML = PARTS.map((p, i) => `<li><button type="button" data-pick="${p.id}" aria-pressed="false"><span>${String(i + 1).padStart(2, "0")}</span>${p.name}</button></li>`).join("");
+    list.innerHTML = GROUPS.map(([id, label]) => `<li class="ma-group"><span class="ma-group-name">${label}</span><ul>${PARTS.filter((p) => p.group === id).map((p) => `<li><button type="button" data-pick="${p.id}" aria-pressed="false"><span>${String(PARTS.indexOf(p) + 1).padStart(2, "0")}</span>${p.name}</button></li>`).join("")}</ul></li>`).join("");
     list.addEventListener("pointerover", (e) => { const b = e.target.closest("[data-pick]"); if (b) hover(b.dataset.pick); });
     list.addEventListener("pointerleave", () => hover(null));
     list.addEventListener("click", (e) => { const b = e.target.closest("[data-pick]"); if (b) pick(b.dataset.pick); });
